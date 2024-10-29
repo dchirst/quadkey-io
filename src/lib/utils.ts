@@ -1,6 +1,7 @@
-import { tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
+import { quadkeyToTile, tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
 import * as turf from '@turf/turf';
-import type { Feature, FeatureCollection } from 'geojson';
+import type { Feature, FeatureCollection, BBox } from 'geojson';
+import { area, bboxPolygon } from '@turf/turf';
 
 export function tile2lon(x: number, z: number): number {
 	/** Converts x tile coordinate to longitude
@@ -147,8 +148,12 @@ export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
 export function highlightQuadkey(
 	map: maplibregl.Map,
 	newQuadkey: string,
-	tile: [number, number, number]
+	tile: [number, number, number],
+	flyTo: boolean = false
 ) {
+	if (!newQuadkey) {
+		return;
+	}
 	const bbox = tileToBBOX(tile);
 	const polygon = turf.bboxPolygon(bbox);
 
@@ -172,5 +177,36 @@ export function highlightQuadkey(
 		});
 	}
 
+	if (flyTo) {
+		map.flyTo({
+			center: [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2],
+			zoom: tile[2] + 1
+		});
+	}
 	return newQuadkey;
+}
+
+export function quadkeyToBBOX(qk: string): BBox {
+	const tile = quadkeyToTile(qk);
+	return tileToBBOX(tile).map((coord) => parseFloat(coord.toFixed(3))) as BBox;
+}
+
+export function quadkeyToAreaInHectares(qk: string): string {
+	const bbox = quadkeyToBBOX(qk);
+	const polygon = bboxPolygon(bbox);
+	const areaHa: number = area(polygon) / 10000;
+	return areaHa.toFixed(3); // Convert square meters to hectares
+}
+
+export function saveAsGeoJSON(quadkey: string) {
+	const bbox = quadkeyToBBOX(quadkey);
+	const polygon = bboxPolygon(bbox);
+	const geojson = JSON.stringify(polygon);
+	const blob = new Blob([geojson], { type: 'application/json' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = `${quadkey}.geojson`;
+	a.click();
+	URL.revokeObjectURL(url);
 }

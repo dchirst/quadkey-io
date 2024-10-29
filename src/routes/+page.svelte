@@ -2,16 +2,15 @@
 	import { onMount } from 'svelte';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import maplibregl from 'maplibre-gl';
-	import { tileToQuadkey, pointToTile } from '@mapbox/tilebelt';
+	import { tileToQuadkey, pointToTile, quadkeyToTile } from '@mapbox/tilebelt';
 	import Panel from '$lib/Panel.svelte';
 	import { addQuadkeysToMap, highlightQuadkey, updateLines } from '$lib/utils';
+	import { quadkey } from '../stores';
 
-	const apiKey = import.meta.env.VITE_MAPTILER_API_KEY;
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let currentZoom = 0;
 	let currentTile: [number, number, number] | null = null;
-	let quadkey = '';
 
 	function handleArrowPress(direction: string) {
 		if (!currentTile) return;
@@ -42,17 +41,19 @@
 				newTile[1] = 0;
 			}
 			currentTile = newTile;
-			const quadkey = tileToQuadkey(newTile);
-			highlightQuadkey(map, quadkey, newTile);
+			const qk = tileToQuadkey(newTile);
+			highlightQuadkey(map, qk, newTile);
 		}
 	}
+
+	$: highlightQuadkey(map, $quadkey, quadkeyToTile($quadkey), true);
 
 	onMount(() => {
 		const initialState = { lng: 0, lat: 0, zoom: 3 };
 
 		map = new maplibregl.Map({
 			container: mapContainer,
-			style: `https://api.maptiler.com/maps/basic-v2-light/style.json?key=${apiKey}`,
+			style: `https://tiles.openfreemap.org/styles/positron`,
 			center: [initialState.lng, initialState.lat],
 			zoom: initialState.zoom
 		});
@@ -70,14 +71,15 @@
 
 		map.on('click', (e) => {
 			const { lng, lat } = e.lngLat;
-			currentTile = pointToTile(lng, lat, Math.floor(map.getZoom()));
-			const newQuadkey = tileToQuadkey(currentTile);
-			quadkey = highlightQuadkey(map, newQuadkey, currentTile);
+			const zoom = Math.floor(map.getZoom());
+
+			currentTile = pointToTile(lng, lat, zoom);
+			$quadkey = tileToQuadkey(currentTile);
 		});
 	});
 </script>
 
-<Panel {quadkey} onArrowPress={handleArrowPress} />
+<Panel onArrowPress={handleArrowPress} />
 <div class="map-wrap">
 	<a href="https://www.maptiler.com" class="watermark"
 		><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo" /></a

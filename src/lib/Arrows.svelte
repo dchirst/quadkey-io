@@ -25,7 +25,7 @@
 
 <svelte:window on:keydown={handleKeyPress} />
 
-<div class="arrows">
+<div class="arrows p-3">
 	<button on:click={() => handleClick('up')}>⬆️</button>
 	<div class="horizontal-arrows">
 		<button on:click={() => handleClick('left')}>⬅️</button>
