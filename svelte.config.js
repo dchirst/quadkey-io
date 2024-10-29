@@ -12,11 +12,9 @@ const config = {
 			fallback: undefined,
 			precompress: false,
 			strict: true
-		})
-	},
-	vite: {
-		define: {
-			'process.env.VITE_MAPTILER_API_KEY': JSON.stringify(process.env.VITE_MAPTILER_API_KEY)
+		}),
+		paths: {
+			base: process.env.NODE_ENV === 'production' ? '/sveltekit-github-pages' : ''
 		}
 	}
 };
