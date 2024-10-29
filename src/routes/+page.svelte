@@ -7,7 +7,6 @@
 	import { addQuadkeysToMap, highlightQuadkey, updateLines } from '$lib/utils';
 	import { quadkey } from '../stores';
 
-	const apiKey = import.meta.env.VITE_MAPTILER_API_KEY;
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let currentZoom = 0;
@@ -54,7 +53,7 @@
 
 		map = new maplibregl.Map({
 			container: mapContainer,
-			style: `https://api.maptiler.com/maps/basic-v2-light/style.json?key=${apiKey}`,
+			style: `https://tiles.openfreemap.org/styles/positron`,
 			center: [initialState.lng, initialState.lat],
 			zoom: initialState.zoom
 		});
