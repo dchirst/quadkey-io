@@ -2,7 +2,6 @@ import { tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
 import * as turf from '@turf/turf';
 import type { Feature, FeatureCollection } from 'geojson';
 
-
 export function tile2lon(x: number, z: number): number {
 	/** Converts x tile coordinate to longitude
 	 * @param {number} x - x tile coordinate
@@ -48,9 +47,9 @@ export function getLatitudes(zoom: number): number[] {
 
 	return latitudes;
 }
-function generateQuadkeysAndCenters(zoom: number): { quadkey: string, center: [number, number] }[] {
+function generateQuadkeysAndCenters(zoom: number): { quadkey: string; center: [number, number] }[] {
 	const numTiles = Math.pow(2, zoom);
-	const results: { quadkey: string, center: [number, number] }[] = [];
+	const results: { quadkey: string; center: [number, number] }[] = [];
 
 	for (let x = 0; x < numTiles; x++) {
 		for (let y = 0; y < numTiles; y++) {
@@ -67,8 +66,18 @@ export function updateLines(map: maplibregl.Map, zoom: number) {
 	const longitudes = getLongitudes(zoom);
 	const latitudes = getLatitudes(zoom);
 
-	const longitudeLines = longitudes.map(lng => turf.lineString([[lng, -90], [lng, 90]]));
-	const latitudeLines = latitudes.map(lat => turf.lineString([[-180, lat], [180, lat]]));
+	const longitudeLines = longitudes.map((lng) =>
+		turf.lineString([
+			[lng, -90],
+			[lng, 90]
+		])
+	);
+	const latitudeLines = latitudes.map((lat) =>
+		turf.lineString([
+			[-180, lat],
+			[180, lat]
+		])
+	);
 	const geojson = turf.featureCollection([...longitudeLines, ...latitudeLines]);
 
 	if (map.getSource('lines')) {
@@ -91,8 +100,6 @@ export function updateLines(map: maplibregl.Map, zoom: number) {
 		});
 	}
 }
-
-
 
 export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
 	const quadkeysAndCenters = generateQuadkeysAndCenters(zoom);
@@ -137,7 +144,11 @@ export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
 	}
 }
 
-export function highlightQuadkey(map: maplibregl.Map, newQuadkey: string, tile: [number, number, number]) {
+export function highlightQuadkey(
+	map: maplibregl.Map,
+	newQuadkey: string,
+	tile: [number, number, number]
+) {
 	const bbox = tileToBBOX(tile);
 	const polygon = turf.bboxPolygon(bbox);
 
