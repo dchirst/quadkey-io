@@ -64,7 +64,7 @@
 		});
 
 		map.on('zoomend', () => {
-			currentZoom = Math.floor(map.getZoom());
+			currentZoom = Math.ceil(map.getZoom());
 			addQuadkeysToMap(map, currentZoom);
 			updateLines(map, currentZoom);
 		});
@@ -81,9 +81,6 @@
 
 <Panel onArrowPress={handleArrowPress} />
 <div class="map-wrap">
-	<a href="https://www.maptiler.com" class="watermark"
-		><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo" /></a
-	>
 	<div class="map" bind:this={mapContainer}></div>
 </div>
 

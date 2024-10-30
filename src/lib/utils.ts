@@ -111,7 +111,7 @@ export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
 			coordinates: center
 		},
 		properties: {
-			text: quadkey
+			quadkeyId: quadkey
 		}
 	}));
 
@@ -134,12 +134,15 @@ export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
 			type: 'symbol',
 			source: 'quadkeys',
 			layout: {
-				'text-field': ['get', 'text'],
-				'text-size': 20,
-				'text-offset': [0, 0]
+				'text-field': ['get', 'quadkeyId'],
+				'text-size': 30,
+				'text-offset': [0, 0],
+				'text-font': ['Noto Sans Regular']
 			},
 			paint: {
-				'text-color': '#000'
+				'text-color': '#000',
+				'text-halo-color': '#fff',
+				'text-halo-width': 2
 			}
 		});
 	}
