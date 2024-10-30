@@ -64,7 +64,7 @@
 		});
 
 		map.on('zoomend', () => {
-			currentZoom = Math.floor(map.getZoom());
+			currentZoom = Math.ceil(map.getZoom());
 			addQuadkeysToMap(map, currentZoom);
 			updateLines(map, currentZoom);
 		});
