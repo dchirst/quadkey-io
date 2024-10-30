@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { BBox } from 'geojson';
-	import { quadkeyToAreaInHectares, quadkeyToBBOX, saveAsGeoJSON } from '$lib/utils';
 	import { quadkey } from '../stores';
+	import { quadkeyToAreaInHectares, quadkeyToBBOX, saveAsGeoJSON } from '$lib/utils';
 
 	let bbox: BBox;
 	let areaInHectares: string;

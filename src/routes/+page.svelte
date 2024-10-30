@@ -4,8 +4,10 @@
 	import maplibregl from 'maplibre-gl';
 	import { tileToQuadkey, pointToTile, quadkeyToTile } from '@mapbox/tilebelt';
 	import Panel from '$lib/Panel.svelte';
-	import { addQuadkeysToMap, highlightQuadkey, updateLines } from '$lib/utils';
 	import { quadkey } from '../stores';
+	import { addQuadkeysToMap, highlightQuadkey, updateLines } from '$lib/mapUtils';
+
+	// TODO: fix github deployment using relative imports
 
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
@@ -71,7 +73,7 @@
 
 		map.on('click', (e) => {
 			const { lng, lat } = e.lngLat;
-			const zoom = Math.floor(map.getZoom());
+			const zoom = Math.ceil(map.getZoom());
 
 			currentTile = pointToTile(lng, lat, zoom);
 			$quadkey = tileToQuadkey(currentTile);
@@ -97,10 +99,4 @@
 		height: 100%;
 	}
 
-	.watermark {
-		position: absolute;
-		left: 10px;
-		bottom: 10px;
-		z-index: 999;
-	}
 </style>

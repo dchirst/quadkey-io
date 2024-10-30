@@ -18,6 +18,7 @@
 		}
 	}
 
+	// FIXME: Fix arrows not working
 	function handleClick(direction: string) {
 		onArrowPress(direction);
 	}
