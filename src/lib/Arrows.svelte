@@ -1,37 +1,46 @@
 <script lang="ts">
-	export let onArrowPress: (direction: string) => void;
+	import { handleArrowPress } from '$lib/utils';
+
+	import { quadkey } from '../stores';
 
 	function handleKeyPress(event: KeyboardEvent) {
+		let direction: string = '';
 		switch (event.key) {
-			case 'ArrowUp':
-				onArrowPress('up');
+			case 'w':
+				direction = 'up';
 				break;
-			case 'ArrowLeft':
-				onArrowPress('left');
+			case 'a':
+				direction = 'left';
 				break;
-			case 'ArrowDown':
-				onArrowPress('down');
+			case 's':
+				direction = 'down';
 				break;
-			case 'ArrowRight':
-				onArrowPress('right');
+			case 'd':
+				direction = 'right';
 				break;
 		}
+		if (!direction) return;
+
+		changeQuadkey(direction);
 	}
 
-	function handleClick(direction: string) {
-		onArrowPress(direction);
+	function changeQuadkey(direction: string) {
+		const newQuadkey = handleArrowPress($quadkey, direction);
+		if (newQuadkey) {
+			$quadkey = newQuadkey;
+		}
 	}
 </script>
 
 <svelte:window on:keydown={handleKeyPress} />
 
 <div class="arrows p-3">
-	<button on:click={() => handleClick('up')}>⬆️</button>
+	<button on:click={() => changeQuadkey('up')}>⬆️</button>
 	<div class="horizontal-arrows">
-		<button on:click={() => handleClick('left')}>⬅️</button>
-		<button on:click={() => handleClick('right')}>➡️</button>
+		<button on:click={() => changeQuadkey('left')}>⬅️</button>
+		<button on:click={() => changeQuadkey('right')}>➡️</button>
 	</div>
-	<button on:click={() => handleClick('down')}>⬇️</button>
+	<button on:click={() => changeQuadkey('down')}>⬇️</button>
 </div>
 
 <style>

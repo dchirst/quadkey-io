@@ -4,47 +4,15 @@
 	import maplibregl from 'maplibre-gl';
 	import { tileToQuadkey, pointToTile, quadkeyToTile } from '@mapbox/tilebelt';
 	import Panel from '$lib/Panel.svelte';
-	import { addQuadkeysToMap, highlightQuadkey, updateLines } from '$lib/utils';
 	import { quadkey } from '../stores';
+	import { addQuadkeysToMap, highlightQuadkey, updateLines } from '$lib/mapUtils';
+
+	// TODO: fix github deployment using relative imports
 
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let currentZoom = 0;
 	let currentTile: [number, number, number] | null = null;
-
-	function handleArrowPress(direction: string) {
-		if (!currentTile) return;
-
-		const [x, y, z] = currentTile;
-		let newTile: [number, number, number] | null = null;
-
-		switch (direction) {
-			case 'up':
-				newTile = [x, y - 1, z];
-				break;
-			case 'left':
-				newTile = [x - 1, y, z];
-				break;
-			case 'down':
-				newTile = [x, y + 1, z];
-				break;
-			case 'right':
-				newTile = [x + 1, y, z];
-				break;
-		}
-
-		if (newTile) {
-			if (newTile[1] < 0) {
-				newTile[1] = Math.pow(2, z) - 1;
-			}
-			if (newTile[1] >= Math.pow(2, z)) {
-				newTile[1] = 0;
-			}
-			currentTile = newTile;
-			const qk = tileToQuadkey(newTile);
-			highlightQuadkey(map, qk, newTile);
-		}
-	}
 
 	$: highlightQuadkey(map, $quadkey, quadkeyToTile($quadkey), true);
 
@@ -71,7 +39,7 @@
 
 		map.on('click', (e) => {
 			const { lng, lat } = e.lngLat;
-			const zoom = Math.floor(map.getZoom());
+			const zoom = Math.ceil(map.getZoom());
 
 			currentTile = pointToTile(lng, lat, zoom);
 			$quadkey = tileToQuadkey(currentTile);
@@ -79,7 +47,7 @@
 	});
 </script>
 
-<Panel onArrowPress={handleArrowPress} />
+<Panel />
 <div class="map-wrap">
 	<div class="map" bind:this={mapContainer}></div>
 </div>
@@ -95,12 +63,5 @@
 		position: absolute;
 		width: 100%;
 		height: 100%;
-	}
-
-	.watermark {
-		position: absolute;
-		left: 10px;
-		bottom: 10px;
-		z-index: 999;
 	}
 </style>
