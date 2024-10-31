@@ -14,40 +14,6 @@
 	let currentZoom = 0;
 	let currentTile: [number, number, number] | null = null;
 
-	function handleArrowPress(direction: string) {
-		if (!currentTile) return;
-
-		const [x, y, z] = currentTile;
-		let newTile: [number, number, number] | null = null;
-
-		switch (direction) {
-			case 'up':
-				newTile = [x, y - 1, z];
-				break;
-			case 'left':
-				newTile = [x - 1, y, z];
-				break;
-			case 'down':
-				newTile = [x, y + 1, z];
-				break;
-			case 'right':
-				newTile = [x + 1, y, z];
-				break;
-		}
-
-		if (newTile) {
-			if (newTile[1] < 0) {
-				newTile[1] = Math.pow(2, z) - 1;
-			}
-			if (newTile[1] >= Math.pow(2, z)) {
-				newTile[1] = 0;
-			}
-			currentTile = newTile;
-			const qk = tileToQuadkey(newTile);
-			highlightQuadkey(map, qk, newTile);
-		}
-	}
-
 	$: highlightQuadkey(map, $quadkey, quadkeyToTile($quadkey), true);
 
 	onMount(() => {
@@ -81,7 +47,7 @@
 	});
 </script>
 
-<Panel onArrowPress={handleArrowPress} />
+<Panel />
 <div class="map-wrap">
 	<div class="map" bind:this={mapContainer}></div>
 </div>
@@ -98,5 +64,4 @@
 		width: 100%;
 		height: 100%;
 	}
-
 </style>

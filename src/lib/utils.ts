@@ -1,6 +1,5 @@
 import { quadkeyToTile, tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
-import * as turf from '@turf/turf';
-import type { Feature, FeatureCollection, BBox } from 'geojson';
+import type { BBox } from 'geojson';
 import { area, bboxPolygon } from '@turf/turf';
 
 // TODO: add docstrings
@@ -52,7 +51,9 @@ export function getLatitudes(zoom: number): number[] {
 	return latitudes;
 }
 
-export function generateQuadkeysAndCenters(zoom: number): { quadkey: string; center: [number, number] }[] {
+export function generateQuadkeysAndCenters(
+	zoom: number
+): { quadkey: string; center: [number, number] }[] {
 	const numTiles = Math.pow(2, zoom);
 	const results: { quadkey: string; center: [number, number] }[] = [];
 
@@ -91,4 +92,42 @@ export function saveAsGeoJSON(quadkey: string) {
 	a.download = `${quadkey}.geojson`;
 	a.click();
 	URL.revokeObjectURL(url);
+}
+
+export function handleArrowPress(currentQuadkey: string, direction: string) {
+	if (!currentQuadkey) return;
+
+	const currentTile = quadkeyToTile(currentQuadkey);
+
+	const [x, y, z] = currentTile;
+	let newTile: [number, number, number] | null = null;
+
+	switch (direction) {
+		case 'up':
+			newTile = [x, y - 1, z];
+			break;
+		case 'left':
+			newTile = [x - 1, y, z];
+			break;
+		case 'down':
+			newTile = [x, y + 1, z];
+			break;
+		case 'right':
+			newTile = [x + 1, y, z];
+			break;
+	}
+
+	if (newTile) {
+		if (newTile[1] < 0) {
+			newTile[1] = Math.pow(2, z) - 1;
+		}
+		if (newTile[1] >= Math.pow(2, z)) {
+			newTile[1] = 0;
+		}
+		if (newTile[0] < 0) {
+			newTile[0] = Math.pow(2, z) - 1;
+		}
+
+		return tileToQuadkey(newTile);
+	}
 }
