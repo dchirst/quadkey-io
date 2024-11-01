@@ -1,0 +1,47 @@
+name: Release Package
+
+on:
+  push:
+    branches: 'main'
+
+jobs:
+  publish:
+    name: publish_package
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Get package tag
+        id: tag-name
+        run: |
+          echo TAG=v$(jq -r '.version' package.json) >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ steps.tag-name.outputs.TAG }}`,
+              sha: context.sha
+            })
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ steps.tag-name.outputs.TAG }}
+          writeToFile: false
+          includeInvalidCommits: true
+
+      - name: Create Release
+        id: create-release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: false
+          makeLatest: true
+          body: ${{ steps.changelog.outputs.changes }}
+          tag: ${{ steps.tag-name.outputs.TAG }}
