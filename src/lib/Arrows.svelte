@@ -1,9 +1,14 @@
 <script lang="ts">
 	import { handleArrowPress } from '$lib/utils';
 
-	import { quadkey } from '../stores';
+	import { multiSelect, quadkeys } from '../stores';
 
 	function handleKeyPress(event: KeyboardEvent) {
+		if (event.metaKey || event.ctrlKey) {
+			$multiSelect = true;
+			return;
+		}
+
 		let direction: string = '';
 		switch (event.key) {
 			case 'w':
@@ -24,15 +29,22 @@
 		changeQuadkey(direction);
 	}
 
+	function handleKeyUp(event: KeyboardEvent) {
+		if (!event.metaKey && !event.ctrlKey) {
+			$multiSelect = false;
+		}
+	}
+
 	function changeQuadkey(direction: string) {
-		const newQuadkey = handleArrowPress($quadkey, direction);
+		if ($quadkeys.length !== 1) return;
+		const newQuadkey = handleArrowPress($quadkeys[0], direction);
 		if (newQuadkey) {
-			$quadkey = newQuadkey;
+			$quadkeys = [newQuadkey];
 		}
 	}
 </script>
 
-<svelte:window on:keydown={handleKeyPress} />
+<svelte:window on:keydown={handleKeyPress} on:keyup={handleKeyUp} />
 
 <div class="arrows p-3">
 	<button on:click={() => changeQuadkey('up')}>⬆️</button>

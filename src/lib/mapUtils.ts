@@ -1,7 +1,11 @@
 import * as turf from '@turf/turf';
 import type { Feature, FeatureCollection } from 'geojson';
-import { tileToBBOX } from '@mapbox/tilebelt';
-import { generateQuadkeysAndCenters, getLatitudes, getLongitudes } from '$lib/utils';
+import {
+	generateQuadkeysAndCenters,
+	getLatitudes,
+	getLongitudes,
+	quadkeysToGeojson
+} from '$lib/utils';
 
 export function updateLines(map: maplibregl.Map, zoom: number) {
 	const longitudes = getLongitudes(zoom);
@@ -88,25 +92,24 @@ export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
 	}
 }
 
-export function highlightQuadkey(
+export function highlightQuadkeys(
 	map: maplibregl.Map,
-	newQuadkey: string,
-	tile: [number, number, number],
+	newQuadkeys: string[],
 	flyTo: boolean = false
 ) {
-	if (!newQuadkey) {
+	if (!newQuadkeys || newQuadkeys.length === 0 || map === undefined || !map.isStyleLoaded()) {
 		return;
 	}
-	const bbox = tileToBBOX(tile);
-	const polygon = turf.bboxPolygon(bbox);
 
+	const fc = quadkeysToGeojson(newQuadkeys);
 	if (map.getSource('highlight')) {
 		const source = map.getSource('highlight') as maplibregl.GeoJSONSource;
-		source.setData(polygon);
+
+		source.setData(fc);
 	} else {
 		map.addSource('highlight', {
 			type: 'geojson',
-			data: polygon
+			data: fc
 		});
 
 		map.addLayer({
@@ -120,11 +123,10 @@ export function highlightQuadkey(
 		});
 	}
 
+	const extent = turf.bbox(fc);
+	console.log('extent', extent);
 	if (flyTo) {
-		map.flyTo({
-			center: [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2],
-			zoom: tile[2] - 0.5
-		});
+		map.fitBounds(extent as [number, number, number, number], { padding: 20 });
 	}
-	return newQuadkey;
+	return newQuadkeys;
 }
