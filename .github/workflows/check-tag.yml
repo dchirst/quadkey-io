@@ -1,0 +1,33 @@
+name: Check Tag
+
+jobs:
+  check_tag:
+    name: Check if package version is valid
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Get package tag
+        id: tag-name
+        run: |
+          echo TAG=v$(jq -r '.version' package.json) >> $GITHUB_OUTPUT
+
+      - name: Check if tag exists
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Make sure it doesn't exist
+            try {
+              const currentRef = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${{ steps.tag-name.outputs.TAG }}`,
+              });
+              console.log(currentRef);
+              core.setFailed("Something is wrong. The tag already exists.");
+            } catch(e) {
+              // keep going, we are safe
+            }

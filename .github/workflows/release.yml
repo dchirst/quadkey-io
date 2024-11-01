@@ -1,0 +1,79 @@
+name: Reusable Release Package
+
+on:
+  workflow_call:
+
+env:
+  PYTHON_VERSION: 3.9
+  POETRY_VERSION: 1.2.2
+
+jobs:
+  publish:
+    name: publish_package
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Run image
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: ${{ env.POETRY_VERSION }}
+
+      - name: Get package tag
+        id: tag-name
+        run: |
+          echo TAG=v$(poetry version -s) >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ steps.tag-name.outputs.TAG }}`,
+              sha: context.sha
+            })
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ steps.tag-name.outputs.TAG }}
+          writeToFile: false
+          includeInvalidCommits: true
+
+      - name: Create Release
+        id: create-release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: false
+          makeLatest: true
+          body: ${{ steps.changelog.outputs.changes }}
+          tag: ${{ steps.tag-name.outputs.TAG }}
+
+  #notify_slack:
+  #  name: notify_slack
+  #  runs-on: ubuntu-latest
+  #  needs: publish
+  #  steps:
+  #    - name: checkout
+  #      uses: actions/checkout@v3
+
+  #    - name: send_to_slack
+  #      uses: slackapi/slack-github-actions@v1.18.0
+  #      with:
+  #        payload: |
+  #          {
+  #            "text": "The data-eo repository has just published a new tag: ${{ github.event.inputs.tag }}"
+  #          }
+  #      env:
+  #        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL__TAG_NOTIFY }}
+  #        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
