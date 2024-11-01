@@ -1,3 +1,4 @@
 import { writable } from 'svelte/store';
 
-export const quadkey = writable('');
+export const quadkeys = writable<string[]>([]);
+export const multiSelect = writable<boolean>(false);

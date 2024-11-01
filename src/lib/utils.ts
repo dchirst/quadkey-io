@@ -1,6 +1,7 @@
 import { quadkeyToTile, tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
 import type { BBox } from 'geojson';
-import { area, bboxPolygon } from '@turf/turf';
+import { area} from '@turf/turf';
+import * as turf from '@turf/turf';
 
 // TODO: add docstrings
 // TODO: add text for highlighted quadkey
@@ -69,27 +70,38 @@ export function generateQuadkeysAndCenters(
 	return results;
 }
 
-export function quadkeyToBBOX(qk: string): BBox {
-	const tile = quadkeyToTile(qk);
-	return tileToBBOX(tile).map((coord) => parseFloat(coord.toFixed(3))) as BBox;
+export function quadkeysStatistics(quadkeys: string[]) {
+	const geojson = quadkeysToGeojson(quadkeys);
+
+	const bbox = turf.bbox(geojson).map((coord) => parseFloat(coord.toFixed(3))) as BBox;
+	const areaHa = area(geojson) / 10000;
+
+	return {
+		bbox: bbox,
+		areaHa: areaHa.toFixed(3)
+	};
 }
 
-export function quadkeyToAreaInHectares(qk: string): string {
-	const bbox = quadkeyToBBOX(qk);
-	const polygon = bboxPolygon(bbox);
-	const areaHa: number = area(polygon) / 10000;
-	return areaHa.toFixed(3); // Convert square meters to hectares
+export function quadkeysToGeojson(quadkeys: string[]) {
+	const polygons = quadkeys.map((qk) => turf.bboxPolygon(quadkeyToBBOX(qk)));
+
+	const fc = turf.featureCollection(polygons);
+
+	return fc;
 }
 
-export function saveAsGeoJSON(quadkey: string) {
-	const bbox = quadkeyToBBOX(quadkey);
-	const polygon = bboxPolygon(bbox);
-	const geojson = JSON.stringify(polygon);
+export function quadkeyToBBOX(quadkey: string): BBox {
+	const tile = quadkeyToTile(quadkey);
+	return tileToBBOX(tile);
+}
+
+export function saveAsGeoJSON(quadkeys: string[]) {
+	const geojson = JSON.stringify(quadkeysToGeojson(quadkeys));
 	const blob = new Blob([geojson], { type: 'application/json' });
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement('a');
 	a.href = url;
-	a.download = `${quadkey}.geojson`;
+	a.download = `quadkeys.geojson`;
 	a.click();
 	URL.revokeObjectURL(url);
 }
@@ -130,4 +142,18 @@ export function handleArrowPress(currentQuadkey: string, direction: string) {
 
 		return tileToQuadkey(newTile);
 	}
+}
+
+export function handleQuadkeyText(quadkeyText: string) {
+	if (!quadkeyText) return [];
+
+	const qks = quadkeyText.split(',');
+
+	const quadkeys = qks.map((qk) => qk.trim());
+	const filteredQuadkeys = quadkeys.filter((qk) => /^[0-3]{1,16}$/.test(qk));
+	if (filteredQuadkeys.length !== quadkeys.length) {
+		console.log('Invalid quadkeys');
+	}
+
+	return filteredQuadkeys;
 }

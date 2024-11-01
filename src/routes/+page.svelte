@@ -2,19 +2,20 @@
 	import { onMount } from 'svelte';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import maplibregl from 'maplibre-gl';
-	import { tileToQuadkey, pointToTile, quadkeyToTile } from '@mapbox/tilebelt';
+	import { tileToQuadkey, pointToTile } from '@mapbox/tilebelt';
 	import Panel from '$lib/Panel.svelte';
-	import { quadkey } from '../stores';
-	import { addQuadkeysToMap, highlightQuadkey, updateLines } from '$lib/mapUtils';
+	import { quadkeys, multiSelect } from '../stores';
+	import { addQuadkeysToMap, highlightQuadkeys, updateLines } from '$lib/mapUtils';
 
 	// TODO: fix github deployment using relative imports
+	$: highlightQuadkeys(map, $quadkeys, true);
+
+	$: console.log($quadkeys);
 
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let currentZoom = 0;
 	let currentTile: [number, number, number] | null = null;
-
-	$: highlightQuadkey(map, $quadkey, quadkeyToTile($quadkey), true);
 
 	onMount(() => {
 		const initialState = { lng: 0, lat: 0, zoom: 3 };
@@ -42,7 +43,11 @@
 			const zoom = Math.ceil(map.getZoom());
 
 			currentTile = pointToTile(lng, lat, zoom);
-			$quadkey = tileToQuadkey(currentTile);
+			if ($multiSelect) {
+				$quadkeys = [...$quadkeys, tileToQuadkey(currentTile)];
+			} else {
+				$quadkeys = [tileToQuadkey(currentTile)];
+			}
 		});
 	});
 </script>
