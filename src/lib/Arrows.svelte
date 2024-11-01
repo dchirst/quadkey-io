@@ -36,9 +36,10 @@
 	}
 
 	function changeQuadkey(direction: string) {
-		const newQuadkey = handleArrowPress($quadkeys, direction);
+		if ($quadkeys.length !== 1) return;
+		const newQuadkey = handleArrowPress($quadkeys[0], direction);
 		if (newQuadkey) {
-			$quadkeys = newQuadkey;
+			$quadkeys = [newQuadkey];
 		}
 	}
 </script>
