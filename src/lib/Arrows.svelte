@@ -3,7 +3,7 @@
 
 	import { multiSelect, quadkeys } from '../stores';
 
-	function handleKeyPress(event: KeyboardEvent) {
+	export function handleKeyPress(event: KeyboardEvent) {
 		if (event.metaKey || event.ctrlKey) {
 			$multiSelect = true;
 			return;
@@ -29,7 +29,7 @@
 		changeQuadkey(direction);
 	}
 
-	function handleKeyUp(event: KeyboardEvent) {
+	export function handleKeyUp(event: KeyboardEvent) {
 		if (!event.metaKey && !event.ctrlKey) {
 			$multiSelect = false;
 		}

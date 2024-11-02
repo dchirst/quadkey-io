@@ -2,14 +2,14 @@ import * as turf from '@turf/turf';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
 	generateQuadkeysAndCenters,
-	getLatitudes,
-	getLongitudes,
+	quadkeyLatitudes,
+	quadkeyLongitudes,
 	quadkeysToGeojson
 } from '$lib/utils';
 
 export function updateLines(map: maplibregl.Map, zoom: number) {
-	const longitudes = getLongitudes(zoom);
-	const latitudes = getLatitudes(zoom);
+	const longitudes = quadkeyLongitudes(zoom);
+	const latitudes = quadkeyLatitudes(zoom);
 
 	const longitudeLines = longitudes.map((lng) =>
 		turf.lineString([
@@ -119,6 +119,22 @@ export function highlightQuadkeys(
 			paint: {
 				'fill-color': '#ff0000',
 				'fill-opacity': 0.5
+			}
+		});
+		map.addLayer({
+			id: 'highlightedQuadkeyText',
+			type: 'symbol',
+			source: 'highlight',
+			layout: {
+				'text-field': ['get', 'quadkeyId'],
+				'text-size': 40,
+				'text-offset': [0, 0],
+				'text-font': ['Noto Sans Regular']
+			},
+			paint: {
+				'text-color': '#000',
+				'text-halo-color': '#fff',
+				'text-halo-width': 2
 			}
 		});
 	}

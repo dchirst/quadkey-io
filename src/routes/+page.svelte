@@ -7,15 +7,12 @@
 	import { quadkeys, multiSelect } from '../stores';
 	import { addQuadkeysToMap, highlightQuadkeys, updateLines } from '$lib/mapUtils';
 
-	// TODO: fix github deployment using relative imports
-	$: highlightQuadkeys(map, $quadkeys, true);
-
-	$: console.log($quadkeys);
-
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
-	let currentZoom = 0;
-	let currentTile: [number, number, number] | null = null;
+	let zoom: number;
+
+	// When the list of quadkeys changes, highlight them on the map
+	$: highlightQuadkeys(map, $quadkeys, true);
 
 	onMount(() => {
 		const initialState = { lng: 0, lat: 0, zoom: 3 };
@@ -28,45 +25,33 @@
 		});
 
 		map.on('load', () => {
+			// Add quadkeys to the map
 			updateLines(map, initialState.zoom);
 			addQuadkeysToMap(map, initialState.zoom);
 		});
 
 		map.on('zoomend', () => {
-			currentZoom = Math.ceil(map.getZoom());
-			addQuadkeysToMap(map, currentZoom);
-			updateLines(map, currentZoom);
+			// When zoom changes, update the lines and add new quadkeys
+			zoom = Math.ceil(map.getZoom());
+			addQuadkeysToMap(map, zoom);
+			updateLines(map, zoom);
 		});
 
 		map.on('click', (e) => {
+			// When a user clicks on the map, get the quadkey of the clicked tile
 			const { lng, lat } = e.lngLat;
-			const zoom = Math.ceil(map.getZoom());
 
-			currentTile = pointToTile(lng, lat, zoom);
+			const clickedQuadkey = tileToQuadkey(pointToTile(lng, lat, zoom));
 			if ($multiSelect) {
-				$quadkeys = [...$quadkeys, tileToQuadkey(currentTile)];
+				$quadkeys = [...$quadkeys, clickedQuadkey];
 			} else {
-				$quadkeys = [tileToQuadkey(currentTile)];
+				$quadkeys = [clickedQuadkey];
 			}
 		});
 	});
 </script>
 
 <Panel />
-<div class="map-wrap">
-	<div class="map" bind:this={mapContainer}></div>
+<div class="relative w-full" style="height: 100vh">
+	<div class="absolute h-full w-full" bind:this={mapContainer}></div>
 </div>
-
-<style>
-	.map-wrap {
-		position: relative;
-		width: 100%;
-		height: 100vh; /* Full viewport height */
-	}
-
-	.map {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-	}
-</style>

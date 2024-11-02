@@ -1,6 +1,6 @@
 import { quadkeyToTile, tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
 import type { BBox } from 'geojson';
-import { area} from '@turf/turf';
+import { area } from '@turf/turf';
 import * as turf from '@turf/turf';
 
 // TODO: add docstrings
@@ -25,7 +25,7 @@ export function tile2lat(y: number, z: number): number {
 	return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
 }
 
-export function getLongitudes(zoom: number): number[] {
+export function quadkeyLongitudes(zoom: number): number[] {
 	/** Get the longitudes for all tiles at a given zoom level
 	 *
 	 * @param {number} zoom - zoom level
@@ -41,7 +41,12 @@ export function getLongitudes(zoom: number): number[] {
 	return longitudes;
 }
 
-export function getLatitudes(zoom: number): number[] {
+export function quadkeyLatitudes(zoom: number): number[] {
+	/** Get the latitudes for all tiles at a given zoom level
+	 *
+	 * @param {number} zoom - zoom level
+	 * @returns {number[]} - latitudes
+	 */
 	const numTiles = Math.pow(2, zoom);
 	const latitudes: number[] = [];
 
@@ -55,6 +60,11 @@ export function getLatitudes(zoom: number): number[] {
 export function generateQuadkeysAndCenters(
 	zoom: number
 ): { quadkey: string; center: [number, number] }[] {
+	/** Generate quadkeys and centers for all tiles at a given zoom level
+	 *
+	 * @param {number} zoom - zoom level
+	 * @returns {Object[]}
+	 * */
 	const numTiles = Math.pow(2, zoom);
 	const results: { quadkey: string; center: [number, number] }[] = [];
 
@@ -71,6 +81,11 @@ export function generateQuadkeysAndCenters(
 }
 
 export function quadkeysStatistics(quadkeys: string[]) {
+	/** Get the bounding box and area for a list of quadkeys
+	 *
+	 * @param {string[]}
+	 * @returns {Object}
+	 * */
 	const geojson = quadkeysToGeojson(quadkeys);
 
 	const bbox = turf.bbox(geojson).map((coord) => parseFloat(coord.toFixed(3))) as BBox;
@@ -83,19 +98,37 @@ export function quadkeysStatistics(quadkeys: string[]) {
 }
 
 export function quadkeysToGeojson(quadkeys: string[]) {
-	const polygons = quadkeys.map((qk) => turf.bboxPolygon(quadkeyToBBOX(qk)));
+	/** Convert a list of quadkeys to a GeoJSON FeatureCollection
+	 *
+	 * @param {string[]} quadkeys
+	 * @returns {FeatureCollection}
+	 * */
+	const features = quadkeys.map((qk) => {
+		const feat = turf.bboxPolygon(quadkeyToBBOX(qk));
+		feat.properties = { quadkeyId: qk };
+		return feat;
+	});
 
-	const fc = turf.featureCollection(polygons);
+	const fc = turf.featureCollection(features);
 
 	return fc;
 }
 
 export function quadkeyToBBOX(quadkey: string): BBox {
+	/** Get the bounding box for a quadkey
+	 *
+	 * @param {string} quadkey
+	 * @returns {BBox}
+	 * */
 	const tile = quadkeyToTile(quadkey);
 	return tileToBBOX(tile);
 }
 
 export function saveAsGeoJSON(quadkeys: string[]) {
+	/** Save a list of quadkeys as a GeoJSON file
+	 *
+	 * @param {string[]} quadkeys
+	 * */
 	const geojson = JSON.stringify(quadkeysToGeojson(quadkeys));
 	const blob = new Blob([geojson], { type: 'application/json' });
 	const url = URL.createObjectURL(blob);
@@ -107,6 +140,12 @@ export function saveAsGeoJSON(quadkeys: string[]) {
 }
 
 export function handleArrowPress(currentQuadkey: string, direction: string) {
+	/** Get the quadkey in the direction of the arrow key
+	 *
+	 * @param {string} currentQuadkey
+	 * @param {string} 'up' | 'left' | 'down' | 'right'
+	 * @returns {string | null}
+	 * */
 	if (!currentQuadkey) return;
 
 	const currentTile = quadkeyToTile(currentQuadkey);
@@ -145,6 +184,11 @@ export function handleArrowPress(currentQuadkey: string, direction: string) {
 }
 
 export function handleQuadkeyText(quadkeyText: string) {
+	/** Parse a string of quadkeys separated by commas
+	 *
+	 * @param {string} quadkeyText
+	 * @returns {string[]} - list of quadkeys
+	 * */
 	if (!quadkeyText) return [];
 
 	const qks = quadkeyText.split(',');
@@ -156,4 +200,14 @@ export function handleQuadkeyText(quadkeyText: string) {
 	}
 
 	return filteredQuadkeys;
+}
+
+export function copyToClipboard(text: string) {
+	/** Copy text to clipboard
+	 *
+	 * @param {string} text
+	 * */
+	navigator.clipboard.writeText(text).then(() => {
+		alert('Copied to clipboard');
+	});
 }

@@ -1,18 +1,17 @@
 <script lang="ts">
 	import { quadkeys } from '../stores';
-	import { handleQuadkeyText, quadkeysStatistics, saveAsGeoJSON } from '$lib/utils';
+	import {
+		copyToClipboard,
+		handleQuadkeyText,
+		quadkeysStatistics,
+		saveAsGeoJSON
+	} from '$lib/utils';
 
 	let quadkeyText = '';
 
 	$: stats = quadkeysStatistics($quadkeys);
 
 	$: $quadkeys = handleQuadkeyText(quadkeyText);
-
-	function copyToClipboard(text: string) {
-		navigator.clipboard.writeText(text).then(() => {
-			alert('Copied to clipboard');
-		});
-	}
 </script>
 
 <div class="z-50 mx-auto w-full max-w-md rounded-2xl bg-red-100 p-6 shadow-lg">
