@@ -6,6 +6,7 @@ import {
 	quadkeyLongitudes,
 	quadkeysToGeojson
 } from '$lib/utils';
+import { pointToTile, tileToQuadkey, tileToBBOX } from '@mapbox/tilebelt';
 
 export function updateLines(map: maplibregl.Map, zoom: number) {
 	const longitudes = quadkeyLongitudes(zoom);
@@ -97,11 +98,15 @@ export function highlightQuadkeys(
 	newQuadkeys: string[],
 	flyTo: boolean = false
 ) {
-	if (!newQuadkeys || newQuadkeys.length === 0 || map === undefined || !map.isStyleLoaded()) {
+	if (!newQuadkeys || newQuadkeys.length === 0 || map === undefined) {
 		return;
 	}
 
+	console.log('here')
+
 	const fc = quadkeysToGeojson(newQuadkeys);
+
+	console.log('fc', fc);
 	if (map.getSource('highlight')) {
 		const source = map.getSource('highlight') as maplibregl.GeoJSONSource;
 
@@ -118,7 +123,8 @@ export function highlightQuadkeys(
 			source: 'highlight',
 			paint: {
 				'fill-color': '#ff0000',
-				'fill-opacity': 0.5
+				'fill-opacity': 0.5,
+				'fill-outline-color': '#FFF',
 			}
 		});
 		map.addLayer({
@@ -145,4 +151,54 @@ export function highlightQuadkeys(
 		map.fitBounds(extent as [number, number, number, number], { padding: 20 });
 	}
 	return newQuadkeys;
+}
+
+export function loadInputGeojson(map: maplibregl.Map, geojson: FeatureCollection | null) {
+
+	if (!(geojson && map)) return;
+	if (map.getSource('inputGeojson')) {
+		const source = map.getSource('inputGeojson') as maplibregl.GeoJSONSource;
+		source.setData(geojson);
+	} else {
+		map.addSource('inputGeojson', {
+			type: 'geojson',
+			data: geojson
+		});
+
+		map.addLayer({
+			id: 'inputGeojson',
+			type: 'fill',
+			source: 'inputGeojson',
+			paint: {
+				'fill-color': '#0000ff',
+				'fill-opacity': 0.5,
+				'fill-outline-color': '#000',
+			}
+		});
+	}
+
+	map.fitBounds(turf.bbox(geojson) as [number, number, number, number], { padding: 20 });
+}
+
+export function getQuadkeysInPolygon(geojson: FeatureCollection | null, zoom: number): string[] {
+  if (!geojson) return [];
+	const bbox = turf.bbox(geojson);
+  const [minLng, minLat, maxLng, maxLat] = bbox;
+
+  const minTile = pointToTile(minLng, maxLat, zoom);
+  const maxTile = pointToTile(maxLng, minLat, zoom);
+
+
+  const quadkeys: string[] = [];
+
+  for (let x = minTile[0]; x <= maxTile[0]; x++) {
+    for (let y = minTile[1]; y <= maxTile[1]; y++) {
+      const tilePolygon = turf.bboxPolygon(tileToBBOX([x, y, zoom]));
+      if (turf.booleanIntersects(geojson?.features[0], tilePolygon)) {
+        quadkeys.push(tileToQuadkey([x, y, zoom]));
+      }
+    }
+  }
+
+  return quadkeys;
 }

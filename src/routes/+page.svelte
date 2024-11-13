@@ -4,16 +4,34 @@
 	import maplibregl from 'maplibre-gl';
 	import { tileToQuadkey, pointToTile } from '@mapbox/tilebelt';
 	import Panel from '$lib/Panel.svelte';
-	import { quadkeys, multiSelect } from '../stores';
-	import { addQuadkeysToMap, highlightQuadkeys, updateLines } from '$lib/mapUtils';
+	import { quadkeys, multiSelect, inputGeojson, inputZoom } from '../stores';
+	import {
+		addQuadkeysToMap,
+		getQuadkeysInPolygon,
+		highlightQuadkeys,
+		loadInputGeojson,
+		updateLines
+	} from '$lib/mapUtils';
+	import type { FeatureCollection } from 'geojson';
 
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let zoom: number;
 
 	// When the list of quadkeys changes, highlight them on the map
-	$: highlightQuadkeys(map, $quadkeys, true);
 
+	function handleInput(geojson: FeatureCollection|null, zoom: number) {
+		if (geojson) {
+			loadInputGeojson(map, geojson);
+			const newQuadkeys = getQuadkeysInPolygon(geojson, zoom);
+			$quadkeys = newQuadkeys;
+			highlightQuadkeys(map, newQuadkeys, false);
+		}
+	}
+
+	$: handleInput($inputGeojson, $inputZoom);
+
+	$: highlightQuadkeys(map, $quadkeys, true);
 	onMount(() => {
 		const initialState = { lng: 0, lat: 0, zoom: 3 };
 
