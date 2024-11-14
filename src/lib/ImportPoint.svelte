@@ -1,55 +1,81 @@
 <script lang="ts">
   import type { Feature, Point } from 'geojson';
   import { inputGeojson} from '../stores';
+  import { CircleX } from 'lucide-svelte';
 
 
-  let order = 'lonlat'; // 'latlon' or 'lonlat'
   let errorMessage = '';
   let inputPoint: Feature<Point> | null = null;
-	let coords: string = '';
 
-	function textToFeature(coords: string): Feature<Point> | null{
-		const [p1, p2] = coords.split(',').map(parseFloat);
+  let lon: string;
+  let lat: string;
 
-		if (isNaN(p1) || isNaN(p2)) {
-			errorMessage = 'Invalid coordinates. Please enter two numbers separated by a comma.';
-			return null;
-		}
 
-		 const [lon, lat] = order === 'latlon' ? [p2, p1] : [p1, p2];
 
-		 return {
-			 type: 'Feature',
-			 geometry: {
-				 type: 'Point',
-				 coordinates: [lon, lat]
-			 }
-		 } as Feature<Point>;
-	}
+  function handleImportPoint() {
+    if (lon === undefined || lat === undefined) {
+      errorMessage = 'Please enter both longitude and latitude.';
+      return;
 
-  $: $inputGeojson = {type: 'FeatureCollection', features: inputPoint ? [inputPoint] : []};
+    }
+
+    const lonFloat = parseFloat(lon);
+    const latFloat = parseFloat(lat);
+
+    if (isNaN(lonFloat) || isNaN(latFloat)) {
+      errorMessage = 'Invalid coordinates. Please enter two numbers separated by a comma.';
+      return;
+    }
+
+    if (lonFloat < -180 || lonFloat > 180 || latFloat < -90 || latFloat > 90) {
+      errorMessage = 'Invalid coordinates. Longitude must be between -180 and 180, and latitude must be between -90 and 90.';
+      return;
+    }
+
+    console.log(lonFloat, latFloat);
+
+    errorMessage = '';
+
+    $inputGeojson = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [lonFloat, latFloat]
+          },
+          properties: {}
+        }
+      ]
+    }
+
+  }
+
 
 
 
 </script>
 <div>
-  <label>
-		Coords:
-    <input type="text" bind:value={coords}/>
-  </label>
+<label class="flex form-control w-full max-w-xs">
+  <div class="label gap-1">
+    <span class="label-text gap-0">Longitude</span>
+  </div>
+  <input bind:value={lon} type="text" placeholder="27.12234" class="input input-sm input-bordered w-full max-w-xs" />
+  <div class="label gap-0">
+    <span class="label-text gap-0">Latitude</span>
+  </div>
+  <input type="text" bind:value={lat} placeholder="22.3343423" class="input input-sm input-bordered w-full max-w-xs" />
 
-  <button >Switch Order</button>
+</label>
   {#if errorMessage}
-    <p class="error">{errorMessage}</p>
+    <div class="alert alert-error my-2">
+      <CircleX/>
+      <p class="">{errorMessage}</p>
+    </div>
   {/if}
   {#if inputPoint}
     <p>GeoJSON Point: {JSON.stringify(inputPoint)}</p>
   {/if}
-	<button on:click={() => {inputPoint = textToFeature(coords)}}>Import Point </button>
+	<button on:click={handleImportPoint} class="btn mt-3">Import </button>
 </div>
-
-<style>
-  .error {
-    color: red;
-  }
-</style>

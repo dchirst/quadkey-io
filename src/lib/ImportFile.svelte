@@ -5,6 +5,7 @@
   let files: FileList | null = null;
   let fileInput: HTMLInputElement;
   let errorMessage = '';
+  let errorClass = '';
 
   function inputToGeojson(input: string): FeatureCollection | null {
     try {
@@ -27,7 +28,7 @@
     }
   }
 
-  function handleFileChange(files: FileList | null) {
+  function handleFileChange() {
     if (files && files[0]) {
       const file = files[0];
       const reader = new FileReader();
@@ -43,17 +44,19 @@
     }
   }
 
+  $: errorClass = errorMessage ? 'file-input-error' : '';
+
   $: handleFileChange(files);
 </script>
 
 <div>
-<h1>Import File</h1>
-  <input bind:files bind:this={fileInput} type="file" accept="application/geo+json" class="file-input file-input-bordered w-full max-w-xs" />
-  <input type="number" bind:value={$inputZoom} min="0" class="number-input" />
+  <input bind:files bind:this={fileInput} type="file" accept="application/geo+json" class="file-input {errorClass} file-input-bordered w-full max-w-xs" />
+
   {#if errorMessage}
     <p class="text-red-500">{errorMessage}</p>
   {/if}
-  {#if inputGeojson}
-    <p>GeoJSON file loaded successfully.</p>
-  {/if}
+
+  <button on:click={handleFileChange} class="btn mt-3">Import </button>
+
+
 </div>

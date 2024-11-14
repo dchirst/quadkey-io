@@ -98,15 +98,16 @@ export function highlightQuadkeys(
 	newQuadkeys: string[],
 	flyTo: boolean = false
 ) {
+	console.log('highlightQuadkeys', newQuadkeys);
+	newQuadkeys= newQuadkeys.filter((qk) => /^[0-3]{1,16}$/.test(qk) && qk !== '');
 	if (!newQuadkeys || newQuadkeys.length === 0 || map === undefined) {
 		return;
 	}
 
-	console.log('here')
+
 
 	const fc = quadkeysToGeojson(newQuadkeys);
 
-	console.log('fc', fc);
 	if (map.getSource('highlight')) {
 		const source = map.getSource('highlight') as maplibregl.GeoJSONSource;
 
@@ -146,7 +147,6 @@ export function highlightQuadkeys(
 	}
 
 	const extent = turf.bbox(fc);
-	console.log('extent', extent);
 	if (flyTo) {
 		map.fitBounds(extent as [number, number, number, number], { padding: 20 });
 	}
@@ -154,7 +154,7 @@ export function highlightQuadkeys(
 }
 
 export function loadInputGeojson(map: maplibregl.Map, geojson: FeatureCollection | null) {
-
+	console.log('loadInputGeojson', geojson);
 	if (!(geojson && map)) return;
 	if (map.getSource('inputGeojson')) {
 		const source = map.getSource('inputGeojson') as maplibregl.GeoJSONSource;

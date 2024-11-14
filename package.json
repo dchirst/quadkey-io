@@ -44,6 +44,7 @@
 		"@onsvisual/svelte-maps": "^1.2.20",
 		"@turf/square-grid": "^7.1.0",
 		"@turf/turf": "^7.1.0",
+		"lucide-svelte": "^0.456.0",
 		"maplibre-gl": "^3.6.2",
 		"maplibre-grid": "^1.0.0"
 	},

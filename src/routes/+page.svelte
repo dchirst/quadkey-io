@@ -32,8 +32,13 @@
 	$: handleInput($inputGeojson, $inputZoom);
 
 	$: highlightQuadkeys(map, $quadkeys, true);
+
+
+
 	onMount(() => {
-		const initialState = { lng: 0, lat: 0, zoom: 3 };
+		const initialState = { lng: 0, lat: 0, zoom: $inputZoom };
+
+		zoom = initialState.zoom;
 
 		map = new maplibregl.Map({
 			container: mapContainer,
@@ -58,11 +63,13 @@
 		map.on('click', (e) => {
 			// When a user clicks on the map, get the quadkey of the clicked tile
 			const { lng, lat } = e.lngLat;
-
+			console.log(lng, lat, )
 			const clickedQuadkey = tileToQuadkey(pointToTile(lng, lat, zoom));
+			console.log('clickedQuadkey', clickedQuadkey);
 			if ($multiSelect) {
 				$quadkeys = [...$quadkeys, clickedQuadkey];
 			} else {
+				console.log('clickedQuadkey', clickedQuadkey);
 				$quadkeys = [clickedQuadkey];
 			}
 		});
