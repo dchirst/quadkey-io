@@ -5,7 +5,7 @@
 	import Intro from '$lib/Intro.svelte';
 </script>
 
-<div class="absolute left-4 top-4 z-50 w-96 rounded-2xl bg-white p-5 shadow-lg">
+<div class="absolute left-0 top-0 z-50 w-96 rounded-2xl m-[3vh] border-transparent bg-white p-5 max-h-[94vh] box-border overflow-auto shadow-lg">
 	<Intro />
 	<div class="divider"></div>
 	<QuadkeyInfo />
