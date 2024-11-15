@@ -1,15 +1,22 @@
 import * as turf from '@turf/turf';
 import type { Feature, FeatureCollection } from 'geojson';
+import { pointToTile } from '@mapbox/tilebelt';
 import {
-	generateQuadkeysAndCenters,
+	generateQuadkeysAndCenters, getTileBounds,
 	quadkeyLatitudes,
 	quadkeyLongitudes,
 	quadkeysToGeojson
 } from '$lib/utils';
 
+
+
+
+
 export function updateLines(map: maplibregl.Map, zoom: number) {
-	const longitudes = quadkeyLongitudes(zoom);
-	const latitudes = quadkeyLatitudes(zoom);
+	const [minx, miny, maxx, maxy] = getTileBounds(map.getBounds(), zoom);
+
+	const longitudes = quadkeyLongitudes(zoom, minx , maxx);
+	const latitudes = quadkeyLatitudes(zoom, miny, maxy);
 
 	const longitudeLines = longitudes.map((lng) =>
 		turf.lineString([
@@ -47,7 +54,7 @@ export function updateLines(map: maplibregl.Map, zoom: number) {
 }
 
 export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
-	const quadkeysAndCenters = generateQuadkeysAndCenters(zoom);
+	const quadkeysAndCenters = generateQuadkeysAndCenters(map.getBounds(), zoom);
 	const features: Feature[] = quadkeysAndCenters.map(({ quadkey, center }) => ({
 		type: 'Feature',
 		geometry: {
@@ -142,7 +149,7 @@ export function highlightQuadkeys(
 	const extent = turf.bbox(fc);
 	console.log('extent', extent);
 	if (flyTo) {
-		map.fitBounds(extent as [number, number, number, number], { padding: 20 });
+		map.fitBounds(extent as [number, number, number, number], { padding: 300 });
 	}
 	return newQuadkeys;
 }

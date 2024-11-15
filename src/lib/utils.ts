@@ -1,10 +1,20 @@
-import { quadkeyToTile, tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
+import { pointToTile, quadkeyToTile, tileToBBOX, tileToQuadkey } from '@mapbox/tilebelt';
 import type { BBox } from 'geojson';
 import { area } from '@turf/turf';
 import * as turf from '@turf/turf';
+import type { LngLatBounds } from 'maplibre-gl';
+import { data } from 'autoprefixer';
 
 // TODO: add docstrings
 // TODO: add text for highlighted quadkey
+
+
+export function getTileBounds(bounds: LngLatBounds, zoom: number) {
+	const [minX, minY] = pointToTile(bounds.getWest(), bounds.getNorth(), zoom);
+	const [maxX, maxY] = pointToTile(bounds.getEast(), bounds.getSouth(), zoom);
+	return [ minX, minY, maxX, maxY ];
+}
+
 
 export function tile2lon(x: number, z: number): number {
 	/** Converts x tile coordinate to longitude
@@ -25,39 +35,49 @@ export function tile2lat(y: number, z: number): number {
 	return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
 }
 
-export function quadkeyLongitudes(zoom: number): number[] {
+function getTileValues(zoom: number, minValue: number, maxValue: number) {
+	console.log('getTileValues', zoom, minValue, maxValue);
+		const maxTile = Math.pow(2, zoom);
+		const result: number[] = [];
+		for (let i = minValue; ; i++) {
+			if (i > maxTile) {
+				i = 0;
+			}
+			result.push(i);
+			if (i === maxValue) {
+				break;
+			}
+		}
+		return result;
+
+}
+
+export function quadkeyLongitudes(zoom: number, minx: number, maxx: number): number[] {
 	/** Get the longitudes for all tiles at a given zoom level
 	 *
 	 * @param {number} zoom - zoom level
 	 * @returns {number[]} - longitudes
 	 */
-	const numTiles = Math.pow(2, zoom);
-	const longitudes: number[] = [];
 
-	for (let x = 0; x < numTiles; x++) {
-		longitudes.push(tile2lon(x, zoom));
-	}
 
-	return longitudes;
+	const tileValues = getTileValues(zoom, minx, maxx);
+
+	return tileValues.map((x) => tile2lon(x, zoom));
+
 }
 
-export function quadkeyLatitudes(zoom: number): number[] {
+export function quadkeyLatitudes(zoom: number, miny: number, maxy: number): number[] {
 	/** Get the latitudes for all tiles at a given zoom level
 	 *
 	 * @param {number} zoom - zoom level
 	 * @returns {number[]} - latitudes
 	 */
-	const numTiles = Math.pow(2, zoom);
-	const latitudes: number[] = [];
+	const tileValues = getTileValues(zoom, miny, maxy);
 
-	for (let y = 0; y < numTiles; y++) {
-		latitudes.push(tile2lat(y, zoom));
-	}
-
-	return latitudes;
+	return  tileValues.map((y) => tile2lat(y, zoom));
 }
 
-export function generateQuadkeysAndCenters(
+export function generateQuadkeysAndCenters(bounds: LngLatBounds,
 	zoom: number
 ): { quadkey: string; center: [number, number] }[] {
 	/** Generate quadkeys and centers for all tiles at a given zoom level
@@ -65,19 +85,17 @@ export function generateQuadkeysAndCenters(
 	 * @param {number} zoom - zoom level
 	 * @returns {Object[]}
 	 * */
-	const numTiles = Math.pow(2, zoom);
-	const results: { quadkey: string; center: [number, number] }[] = [];
+	const [minx, miny, maxx, maxy] = getTileBounds(bounds, zoom);
 
-	for (let x = 0; x < numTiles; x++) {
-		for (let y = 0; y < numTiles; y++) {
-			const quadkey = tileToQuadkey([x, y, zoom]);
-			const bbox = tileToBBOX([x, y, zoom]);
-			const center: [number, number] = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
-			results.push({ quadkey, center });
-		}
-	}
+	const xTiles = getTileValues(zoom, minx, maxx);
+	const yTiles = getTileValues(zoom, miny, maxy);
 
-	return results;
+	return xTiles.flatMap((x) => yTiles.map((y) => {
+		const quadkey = tileToQuadkey([x, y, zoom]);
+		const bbox = tileToBBOX([x, y, zoom]);
+		const center: [number, number] = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
+		return { quadkey, center };
+	}));
 }
 
 export function quadkeysStatistics(quadkeys: string[]) {
