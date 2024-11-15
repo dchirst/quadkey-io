@@ -17,6 +17,7 @@
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let zoom: number;
+	let dark;
 
 	// When the list of quadkeys changes, highlight them on the map
 
@@ -37,6 +38,19 @@
 		const initialState = { lng: 0, lat: 0, zoom: $inputZoom };
 
 		zoom = initialState.zoom;
+
+		if (
+			localStorage.theme === 'dark' ||
+			(!('color-theme' in localStorage) &&
+				window.matchMedia('(prefers-color-scheme: dark)').matches)
+		) {
+			dark = true;
+		} else {
+			dark = false;
+		}
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+			dark = event.matches;
+		});
 
 		map = new maplibregl.Map({
 			container: mapContainer,
@@ -83,5 +97,11 @@
 
 <Panel />
 <div class="relative w-full" style="height: 100vh">
-	<div class="absolute h-full w-full" bind:this={mapContainer}></div>
+	<div class="absolute h-full w-full {dark ? 'mapDark' : ''}" bind:this={mapContainer}></div>
 </div>
+
+<style>
+	.mapDark {
+		filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+	}
+</style>

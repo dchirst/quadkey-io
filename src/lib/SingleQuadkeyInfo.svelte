@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Scaling, Copy, Grid2X2, CircleMinus, Check } from 'lucide-svelte';
+	import { Scaling, Copy, Grid2X2, CircleMinus } from 'lucide-svelte';
 	import { quadkeys } from '../stores';
 	import { get } from 'svelte/store';
 	import { quadkeyToBBOX } from '$lib/utils';

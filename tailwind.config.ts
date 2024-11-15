@@ -5,7 +5,11 @@ export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 
 	theme: {
-		extend: {}
+		extend: {
+			colors: {
+				'primary-muted': 'oklch(var(--primary-muted) / 0.8)'
+			}
+		}
 	},
 
 	plugins: [daisyui]

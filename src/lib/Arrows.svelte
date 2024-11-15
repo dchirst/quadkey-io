@@ -48,18 +48,18 @@
 
 <div class="arrows p-3">
 	<div class="tooltip" data-tip="Move Quadkey Up">
-		<button on:click={() => changeQuadkey('up')}><ArrowBigUp /></button>
+		<button class="btn btn-sm" on:click={() => changeQuadkey('up')}><ArrowBigUp /></button>
 	</div>
 	<div class="horizontal-arrows">
 		<div class="tooltip" data-tip="Move Quadkey Left">
-			<button on:click={() => changeQuadkey('left')}><ArrowBigLeft /></button>
+			<button class="btn btn-sm" on:click={() => changeQuadkey('left')}><ArrowBigLeft /></button>
 		</div>
 		<div class="tooltip" data-tip="Move Quadkey Right">
-			<button on:click={() => changeQuadkey('right')}><ArrowBigRight /></button>
+			<button class="btn btn-sm" on:click={() => changeQuadkey('right')}><ArrowBigRight /></button>
 		</div>
 	</div>
 	<div class="tooltip" data-tip="Move Quadkey Down">
-		<button on:click={() => changeQuadkey('down')}><ArrowBigDown /></button>
+		<button class="btn btn-sm" on:click={() => changeQuadkey('down')}><ArrowBigDown /></button>
 	</div>
 </div>
 

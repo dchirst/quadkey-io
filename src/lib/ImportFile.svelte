@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { FeatureCollection, Feature } from 'geojson';
-	import { showImportModal, inputGeojson, inputZoom } from '../stores';
+	import { showImportModal, inputGeojson } from '../stores';
 	import { CircleX } from 'lucide-svelte';
 
 	let files: FileList | null = null;

@@ -1,3 +1,10 @@
+# Release v0.1.2
+
+- Adds dark mode support
+- Fixes panel when panel is really long
+
+---
+
 # Release v0.1.1
 
 - Better documentation of the site.
