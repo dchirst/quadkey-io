@@ -20,7 +20,7 @@
 
 	// When the list of quadkeys changes, highlight them on the map
 
-	function handleInput(geojson: FeatureCollection|null, zoom: number) {
+	function handleInput(geojson: FeatureCollection | null, zoom: number) {
 		if (geojson) {
 			loadInputGeojson(map, geojson);
 			const newQuadkeys = getQuadkeysInPolygon(geojson, zoom);
@@ -32,8 +32,6 @@
 	$: handleInput($inputGeojson, $inputZoom);
 
 	$: highlightQuadkeys(map, $quadkeys, true);
-
-
 
 	onMount(() => {
 		const initialState = { lng: 0, lat: 0, zoom: $inputZoom };
@@ -70,7 +68,7 @@
 		map.on('click', (e) => {
 			// When a user clicks on the map, get the quadkey of the clicked tile
 			const { lng, lat } = e.lngLat;
-			console.log(lng, lat, )
+			console.log(lng, lat);
 			const clickedQuadkey = tileToQuadkey(pointToTile(lng, lat, zoom));
 			console.log('clickedQuadkey', clickedQuadkey);
 			if ($multiSelect) {
