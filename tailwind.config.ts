@@ -6,9 +6,9 @@ export default {
 
 	theme: {
 		extend: {
-      colors: {
-        "primary-muted": "oklch(var(--primary-muted) / 0.8)",
-			},
+			colors: {
+				'primary-muted': 'oklch(var(--primary-muted) / 0.8)'
+			}
 		}
 	},
 
