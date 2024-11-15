@@ -2,6 +2,7 @@ import * as turf from '@turf/turf';
 import type { Feature, FeatureCollection } from 'geojson';
 import {
 	generateQuadkeysAndCenters,
+	getTileBounds,
 	quadkeyLatitudes,
 	quadkeyLongitudes,
 	quadkeysToGeojson
@@ -9,8 +10,10 @@ import {
 import { pointToTile, tileToQuadkey, tileToBBOX } from '@mapbox/tilebelt';
 
 export function updateLines(map: maplibregl.Map, zoom: number) {
-	const longitudes = quadkeyLongitudes(zoom);
-	const latitudes = quadkeyLatitudes(zoom);
+	const [minx, miny, maxx, maxy] = getTileBounds(map.getBounds(), zoom);
+
+	const longitudes = quadkeyLongitudes(zoom, minx, maxx);
+	const latitudes = quadkeyLatitudes(zoom, miny, maxy);
 
 	const longitudeLines = longitudes.map((lng) =>
 		turf.lineString([
@@ -48,7 +51,7 @@ export function updateLines(map: maplibregl.Map, zoom: number) {
 }
 
 export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
-	const quadkeysAndCenters = generateQuadkeysAndCenters(zoom);
+	const quadkeysAndCenters = generateQuadkeysAndCenters(map.getBounds(), zoom);
 	const features: Feature[] = quadkeysAndCenters.map(({ quadkey, center }) => ({
 		type: 'Feature',
 		geometry: {
@@ -99,12 +102,10 @@ export function highlightQuadkeys(
 	flyTo: boolean = false
 ) {
 	console.log('highlightQuadkeys', newQuadkeys);
-	newQuadkeys= newQuadkeys.filter((qk) => /^[0-3]{1,16}$/.test(qk) && qk !== '');
+	newQuadkeys = newQuadkeys.filter((qk) => /^[0-3]{1,16}$/.test(qk) && qk !== '');
 	if (!newQuadkeys || newQuadkeys.length === 0 || map === undefined) {
 		return;
 	}
-
-
 
 	const fc = quadkeysToGeojson(newQuadkeys);
 
@@ -125,7 +126,7 @@ export function highlightQuadkeys(
 			paint: {
 				'fill-color': '#ff0000',
 				'fill-opacity': 0.5,
-				'fill-outline-color': '#FFF',
+				'fill-outline-color': '#FFF'
 			}
 		});
 		map.addLayer({
@@ -148,7 +149,7 @@ export function highlightQuadkeys(
 
 	const extent = turf.bbox(fc);
 	if (flyTo) {
-		map.fitBounds(extent as [number, number, number, number], { padding: 20 });
+		map.fitBounds(extent as [number, number, number, number], { padding: 300 });
 	}
 	return newQuadkeys;
 }
@@ -172,7 +173,7 @@ export function loadInputGeojson(map: maplibregl.Map, geojson: FeatureCollection
 			paint: {
 				'fill-color': '#0000ff',
 				'fill-opacity': 0.5,
-				'fill-outline-color': '#000',
+				'fill-outline-color': '#000'
 			}
 		});
 	}
@@ -181,24 +182,23 @@ export function loadInputGeojson(map: maplibregl.Map, geojson: FeatureCollection
 }
 
 export function getQuadkeysInPolygon(geojson: FeatureCollection | null, zoom: number): string[] {
-  if (!geojson) return [];
+	if (!geojson) return [];
 	const bbox = turf.bbox(geojson);
-  const [minLng, minLat, maxLng, maxLat] = bbox;
+	const [minLng, minLat, maxLng, maxLat] = bbox;
 
-  const minTile = pointToTile(minLng, maxLat, zoom);
-  const maxTile = pointToTile(maxLng, minLat, zoom);
+	const minTile = pointToTile(minLng, maxLat, zoom);
+	const maxTile = pointToTile(maxLng, minLat, zoom);
 
+	const quadkeys: string[] = [];
 
-  const quadkeys: string[] = [];
+	for (let x = minTile[0]; x <= maxTile[0]; x++) {
+		for (let y = minTile[1]; y <= maxTile[1]; y++) {
+			const tilePolygon = turf.bboxPolygon(tileToBBOX([x, y, zoom]));
+			if (turf.booleanIntersects(geojson?.features[0], tilePolygon)) {
+				quadkeys.push(tileToQuadkey([x, y, zoom]));
+			}
+		}
+	}
 
-  for (let x = minTile[0]; x <= maxTile[0]; x++) {
-    for (let y = minTile[1]; y <= maxTile[1]; y++) {
-      const tilePolygon = turf.bboxPolygon(tileToBBOX([x, y, zoom]));
-      if (turf.booleanIntersects(geojson?.features[0], tilePolygon)) {
-        quadkeys.push(tileToQuadkey([x, y, zoom]));
-      }
-    }
-  }
-
-  return quadkeys;
+	return quadkeys;
 }
