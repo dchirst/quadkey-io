@@ -1,3 +1,10 @@
+# Release v0.1.1
+
+- Better documentation of the site.
+- Add tooltips
+
+---
+
 # Release v0.1.0
 
 Large overhaul of the codebase:
