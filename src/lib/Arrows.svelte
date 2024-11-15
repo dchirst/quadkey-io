@@ -47,12 +47,20 @@
 <svelte:window on:keydown={handleKeyPress} on:keyup={handleKeyUp} />
 
 <div class="arrows p-3">
-	<button on:click={() => changeQuadkey('up')}><ArrowBigUp /></button>
-	<div class="horizontal-arrows">
-		<button on:click={() => changeQuadkey('left')}><ArrowBigLeft /></button>
-		<button on:click={() => changeQuadkey('right')}><ArrowBigRight /></button>
+	<div class="tooltip" data-tip="Move Quadkey Up">
+		<button on:click={() => changeQuadkey('up')}><ArrowBigUp /></button>
 	</div>
-	<button on:click={() => changeQuadkey('down')}><ArrowBigDown /></button>
+	<div class="horizontal-arrows">
+		<div class="tooltip" data-tip="Move Quadkey Left">
+			<button on:click={() => changeQuadkey('left')}><ArrowBigLeft /></button>
+		</div>
+		<div class="tooltip" data-tip="Move Quadkey Right">
+			<button on:click={() => changeQuadkey('right')}><ArrowBigRight /></button>
+		</div>
+	</div>
+	<div class="tooltip" data-tip="Move Quadkey Down">
+		<button on:click={() => changeQuadkey('down')}><ArrowBigDown /></button>
+	</div>
 </div>
 
 <style>
