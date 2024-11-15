@@ -50,6 +50,7 @@
 </script>
 
 <div>
+	<p class="my-3">Select a point to see the quadkey that encompasses it.</p>
 	<label class="form-control flex w-full max-w-xs">
 		<div class="label gap-1">
 			<span class="label-text gap-0">Longitude</span>

@@ -17,9 +17,7 @@
 			checked="checked"
 		/>
 
-		<input type="radio" name="my_tabs_1" role="tab" class="tab " aria-label="File" checked="checked" />
-
-    <div role="tabpanel" class="tab-content p-3">
+		<div role="tabpanel" class="tab-content p-3">
 			<ImportFile />
 		</div>
 
@@ -28,10 +26,10 @@
 			<ImportPoint />
 		</div>
 
-    <input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Freetext" />
-    <div role="tabpanel" class="tab-content p-3">
-      <ImportFreeText/>
-    </div>  <span class="tab"></span>
-
-  </div>
+		<input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="Freetext" />
+		<div role="tabpanel" class="tab-content p-3">
+			<ImportFreeText />
+		</div>
+		<span class="tab"></span>
+	</div>
 </div>

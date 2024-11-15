@@ -6,7 +6,10 @@ import type { LngLatBounds } from 'maplibre-gl';
 
 // TODO: add docstrings
 
-export function getTileBounds(bounds: LngLatBounds, zoom: number): [number, number, number, number] {
+export function getTileBounds(
+	bounds: LngLatBounds,
+	zoom: number
+): [number, number, number, number] {
 	/** Convert the lat/lng bounds to tile bounds at a given zoom level
 	 *
 	 * @param {LngLatBounds} bounds - bounds of the map

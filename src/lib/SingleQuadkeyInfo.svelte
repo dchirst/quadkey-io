@@ -2,10 +2,13 @@
 	import { Scaling, Copy, Grid2X2, CircleMinus, Check } from 'lucide-svelte';
 	import { quadkeys } from '../stores';
 	import { get } from 'svelte/store';
+	import { quadkeyToBBOX } from '$lib/utils';
+	import CopyButton from '$lib/CopyButton.svelte';
+	import { area, bboxPolygon } from '@turf/turf';
 
 	export let index: number;
 	let quadkey = '';
-	let copied = false;
+	let bbox = '';
 
 	// Update the quadkey in the store whenever the local quadkey changes
 
@@ -20,6 +23,10 @@
 
 	function deleteQuadkey() {
 		const currentQuadkeys = get(quadkeys);
+		if (currentQuadkeys.length === 1) {
+			$quadkeys = [];
+			return;
+		}
 		currentQuadkeys.splice(index, 1);
 		quadkeys.set(currentQuadkeys);
 	}
@@ -28,13 +35,10 @@
 
 	$: updateQuadkeyOnStoreChange($quadkeys);
 
-	function handleCopy() {
-		navigator.clipboard.writeText(quadkey);
-		copied = true;
-		setTimeout(() => {
-			copied = false;
-		}, 1000);
-	}
+	$: bbox = quadkeyToBBOX(quadkey)
+		.map((coord) => coord.toFixed(5))
+		.join(', ');
+	$: areaHa = area(bboxPolygon(quadkeyToBBOX(quadkey))) / 10000;
 </script>
 
 <div class="mb-4 flex items-center space-x-2">
@@ -46,13 +50,15 @@
 		placeholder="000000"
 		bind:value={quadkey}
 	/>
-	<button class="btn btn-square btn-sm" on:click={handleCopy}>
-		<span id="default-message" class={copied ? 'hidden' : ''}><Copy /></span>
-		<span id="success-message" class="{copied ? '' : 'hidden'} inline-flex items-center">
-			<Check />
-		</span>
-	</button>
-	<button class="btn btn-square btn-sm"><Scaling /></button>
-	<button class="btn btn-square btn-sm"><Grid2X2 /></button>
-	<button on:click={deleteQuadkey} class="btn btn-square btn-sm"><CircleMinus /></button>
+	<CopyButton textToCopy={quadkey} tooltipText="Copy Quadkey"><Copy /></CopyButton>
+	<CopyButton textToCopy={areaHa} tooltipText="Copy quadkey area: {areaHa.toLocaleString()} ha"
+		><Scaling /></CopyButton
+	>
+	<CopyButton textToCopy={bbox} tooltipText="Copy bbox: {bbox}"><Grid2X2 /></CopyButton>
+
+	<div class="tooltip" data-tip="Delete Quadkey">
+		<button on:click={deleteQuadkey} class="btn btn-square btn-error btn-sm"
+			><CircleMinus class="text-white" /></button
+		>
+	</div>
 </div>
