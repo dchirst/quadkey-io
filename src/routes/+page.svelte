@@ -42,7 +42,6 @@
 			zoom = Math.ceil(map.getZoom());
 			addQuadkeysToMap(map, zoom);
 			updateLines(map, zoom);
-
 		});
 
 		map.on('click', (e) => {

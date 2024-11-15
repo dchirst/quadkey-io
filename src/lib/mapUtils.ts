@@ -1,21 +1,17 @@
 import * as turf from '@turf/turf';
 import type { Feature, FeatureCollection } from 'geojson';
-import { pointToTile } from '@mapbox/tilebelt';
 import {
-	generateQuadkeysAndCenters, getTileBounds,
+	generateQuadkeysAndCenters,
+	getTileBounds,
 	quadkeyLatitudes,
 	quadkeyLongitudes,
 	quadkeysToGeojson
 } from '$lib/utils';
 
-
-
-
-
 export function updateLines(map: maplibregl.Map, zoom: number) {
 	const [minx, miny, maxx, maxy] = getTileBounds(map.getBounds(), zoom);
 
-	const longitudes = quadkeyLongitudes(zoom, minx , maxx);
+	const longitudes = quadkeyLongitudes(zoom, minx, maxx);
 	const latitudes = quadkeyLatitudes(zoom, miny, maxy);
 
 	const longitudeLines = longitudes.map((lng) =>
