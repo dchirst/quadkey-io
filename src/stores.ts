@@ -9,6 +9,6 @@ export const multiSelect = writable<boolean>(false);
 
 export const showImportModal = writable<boolean>(true);
 
-export const inputGeojson = writable<FeatureCollection|null>(null);
+export const inputGeojson = writable<FeatureCollection | null>(null);
 
 export const inputZoom = writable<number>(4);

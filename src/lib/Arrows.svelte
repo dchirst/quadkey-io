@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { handleArrowPress } from '$lib/utils';
-	import { ArrowBigUp, ArrowBigDown, ArrowBigLeft, ArrowBigRight} from 'lucide-svelte';
+	import { ArrowBigUp, ArrowBigDown, ArrowBigLeft, ArrowBigRight } from 'lucide-svelte';
 	import { multiSelect, quadkeys } from '../stores';
 
 	export function handleKeyPress(event: KeyboardEvent) {
@@ -47,12 +47,12 @@
 <svelte:window on:keydown={handleKeyPress} on:keyup={handleKeyUp} />
 
 <div class="arrows p-3">
-	<button on:click={() => changeQuadkey('up')}><ArrowBigUp/></button>
+	<button on:click={() => changeQuadkey('up')}><ArrowBigUp /></button>
 	<div class="horizontal-arrows">
-		<button on:click={() => changeQuadkey('left')}><ArrowBigLeft/></button>
-		<button on:click={() => changeQuadkey('right')}><ArrowBigRight/></button>
+		<button on:click={() => changeQuadkey('left')}><ArrowBigLeft /></button>
+		<button on:click={() => changeQuadkey('right')}><ArrowBigRight /></button>
 	</div>
-	<button on:click={() => changeQuadkey('down')}><ArrowBigDown/></button>
+	<button on:click={() => changeQuadkey('down')}><ArrowBigDown /></button>
 </div>
 
 <style>
