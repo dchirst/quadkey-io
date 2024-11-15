@@ -17,7 +17,7 @@
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let zoom: number;
-	let dark;
+	let dark: boolean;
 
 	// When the list of quadkeys changes, highlight them on the map
 
@@ -94,6 +94,10 @@
 		});
 	});
 </script>
+<svelte:head>
+    <title>Quadkey Navigator</title>
+	<meta name="description" content="A tool to visualise quadkeys." />
+</svelte:head>
 
 <Panel />
 <div class="relative w-full" style="height: 100vh">
