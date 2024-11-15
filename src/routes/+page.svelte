@@ -60,6 +60,13 @@
 			updateLines(map, zoom);
 		});
 
+		map.on('moveend', () => {
+			// When zoom changes, update the lines and add new quadkeys
+			zoom = Math.ceil(map.getZoom());
+			addQuadkeysToMap(map, zoom);
+			updateLines(map, zoom);
+		});
+
 		map.on('click', (e) => {
 			// When a user clicks on the map, get the quadkey of the clicked tile
 			const { lng, lat } = e.lngLat;
