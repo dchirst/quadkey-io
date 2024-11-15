@@ -1,10 +1,11 @@
 <script lang="ts">
 	import type { FeatureCollection, Feature } from 'geojson';
 	import { showImportModal, inputGeojson, inputZoom } from '../stores';
+	import { CircleX } from 'lucide-svelte';
 
 	let files: FileList | null = null;
 	let fileInput: HTMLInputElement;
-	let errorMessage = '';
+	let invalid = false;
 	let errorClass = '';
 
 	function inputToGeojson(input: string): FeatureCollection | null {
@@ -19,12 +20,12 @@
 			} else if (geojson.type == 'FeatureCollection') {
 				return geojson as FeatureCollection;
 			} else {
-				errorMessage = 'Invalid GeoJSON file. Please upload a valid GeoJSON file.';
+				invalid = true;
 				return null;
 			}
 		} catch (e) {
 			console.log(e);
-			errorMessage = 'Invalid GeoJSON file. Please upload a valid GeoJSON file.';
+			invalid = true;
 			return null;
 		}
 	}
@@ -42,25 +43,28 @@
 			};
 
 			reader.readAsText(file);
+			invalid = false;
+		} else {
+			invalid = true;
 		}
 	}
-
-	$: errorClass = errorMessage ? 'file-input-error' : '';
-
-	$: handleFileChange(files);
+	$: errorClass = invalid ? 'file-input-error' : '';
 </script>
 
 <div>
+	<p class="my-3">Load in a GeoJSON file to see the overlapping quadkeys.</p>
 	<input
 		bind:files
 		bind:this={fileInput}
 		type="file"
 		accept="application/geo+json"
-		class="file-input {errorClass} file-input-bordered w-full max-w-xs"
+		class="file-input {errorClass} file-input-bordered my-2 w-full max-w-xs"
 	/>
-
-	{#if errorMessage}
-		<p class="text-red-500">{errorMessage}</p>
+	{#if invalid}
+		<div class="alert alert-error">
+			<CircleX />
+			<p class="">Please load a valid GeoJSON</p>
+		</div>
 	{/if}
 
 	<button on:click={handleFileChange} class="btn mt-3">Import </button>

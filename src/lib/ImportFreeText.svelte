@@ -23,6 +23,7 @@
 </script>
 
 <div>
+	<p class="my-3">Paste a valid GeoJSON to see the overlapping quadkeys.</p>
 	<textarea bind:value={freetext} class="textarea textarea-bordered {errorClass} w-full" />
 	{#if invalid}
 		<div class="alert alert-error">
