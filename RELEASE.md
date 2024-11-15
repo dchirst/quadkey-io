@@ -1,3 +1,9 @@
+# Release v0.1.3
+
+- Add title and icon to the page
+
+---
+
 # Release v0.1.2
 
 - Adds dark mode support
