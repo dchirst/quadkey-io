@@ -1,6 +1,6 @@
 {
 	"name": "quadkey-io",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -42,12 +42,10 @@
 	"dependencies": {
 		"@mapbox/tilebelt": "^2.0.0",
 		"@onsvisual/svelte-maps": "^1.2.20",
-		"@svelte-plugins/tooltips": "^3.0.1",
 		"@turf/square-grid": "^7.1.0",
 		"@turf/turf": "^7.1.0",
 		"lucide-svelte": "^0.456.0",
-		"maplibre-gl": "^3.6.2",
-		"maplibre-grid": "^1.0.0"
+		"maplibre-gl": "^3.6.2"
 	},
 	"lint-staged": {
 		"*.js": "eslint --cache --fix",
