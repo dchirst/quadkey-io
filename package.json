@@ -1,6 +1,6 @@
 {
 	"name": "quadkey-io",
-	"version": "0.0.10",
+	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -20,6 +20,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^9.6.0",
 		"autoprefixer": "^10.4.20",
+		"daisyui": "^4.12.14",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
@@ -43,6 +44,7 @@
 		"@onsvisual/svelte-maps": "^1.2.20",
 		"@turf/square-grid": "^7.1.0",
 		"@turf/turf": "^7.1.0",
+		"lucide-svelte": "^0.456.0",
 		"maplibre-gl": "^3.6.2",
 		"maplibre-grid": "^1.0.0"
 	},

@@ -4,18 +4,39 @@
 	import maplibregl from 'maplibre-gl';
 	import { tileToQuadkey, pointToTile } from '@mapbox/tilebelt';
 	import Panel from '$lib/Panel.svelte';
-	import { quadkeys, multiSelect } from '../stores';
-	import { addQuadkeysToMap, highlightQuadkeys, updateLines } from '$lib/mapUtils';
+	import { quadkeys, multiSelect, inputGeojson, inputZoom } from '../stores';
+	import {
+		addQuadkeysToMap,
+		getQuadkeysInPolygon,
+		highlightQuadkeys,
+		loadInputGeojson,
+		updateLines
+	} from '$lib/mapUtils';
+	import type { FeatureCollection } from 'geojson';
 
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
 	let zoom: number;
 
 	// When the list of quadkeys changes, highlight them on the map
+
+	function handleInput(geojson: FeatureCollection | null, zoom: number) {
+		if (geojson) {
+			loadInputGeojson(map, geojson);
+			const newQuadkeys = getQuadkeysInPolygon(geojson, zoom);
+			$quadkeys = newQuadkeys;
+			highlightQuadkeys(map, newQuadkeys, false);
+		}
+	}
+
+	$: handleInput($inputGeojson, $inputZoom);
+
 	$: highlightQuadkeys(map, $quadkeys, true);
 
 	onMount(() => {
-		const initialState = { lng: 0, lat: 0, zoom: 3 };
+		const initialState = { lng: 0, lat: 0, zoom: $inputZoom };
+
+		zoom = initialState.zoom;
 
 		map = new maplibregl.Map({
 			container: mapContainer,
@@ -47,11 +68,13 @@
 		map.on('click', (e) => {
 			// When a user clicks on the map, get the quadkey of the clicked tile
 			const { lng, lat } = e.lngLat;
-
+			console.log(lng, lat);
 			const clickedQuadkey = tileToQuadkey(pointToTile(lng, lat, zoom));
+			console.log('clickedQuadkey', clickedQuadkey);
 			if ($multiSelect) {
 				$quadkeys = [...$quadkeys, clickedQuadkey];
 			} else {
+				console.log('clickedQuadkey', clickedQuadkey);
 				$quadkeys = [clickedQuadkey];
 			}
 		});

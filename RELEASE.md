@@ -1,3 +1,14 @@
+# Release v0.1.0
+
+Large overhaul of the codebase:
+- Add DaisyUI for styling
+- Use Lucide icons for the buttons
+- Consolidate zooming and moving buttons into a single Control Panel
+- Add Import functionality by file, point, or free text
+- Improve visualisation of multiple quadkeys with a table and list
+
+---
+
 # Release v0.0.10
 
 Fix how the quadkeys are displayed on the map:
