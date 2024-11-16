@@ -21,7 +21,7 @@
 	$: link = getLink($quadkeys);
 </script>
 
-<div class="">
+<div class="w-full">
 	<div class="rounded-2xl bg-primary p-3">
 		<div class="mb-2 flex items-center justify-between">
 			<h2 class="text-lg text-white">Quadkey List</h2>
