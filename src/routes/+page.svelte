@@ -30,6 +30,18 @@
 		}
 	}
 
+	function loadQuadkeysFromParams() {
+		const urlParams = new URLSearchParams(window.location.search);
+
+		if (urlParams.has('qk')) {
+			const qk: string | null = urlParams.get('qk');
+			if (qk) {
+				$quadkeys = qk.split(',');
+				console.log('qk', $quadkeys);
+			}
+		}
+	}
+
 	$: handleInput($inputGeojson, $inputZoom);
 
 	$: highlightQuadkeys(map, $quadkeys, true);
@@ -92,10 +104,15 @@
 				$quadkeys = [clickedQuadkey];
 			}
 		});
+
+		map.on('style.load', () => {
+			loadQuadkeysFromParams();
+		});
 	});
 </script>
+
 <svelte:head>
-    <title>Quadkey Navigator</title>
+	<title>Quadkey Navigator</title>
 	<meta name="description" content="A tool to visualise quadkeys." />
 </svelte:head>
 

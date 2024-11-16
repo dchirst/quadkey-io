@@ -1,3 +1,10 @@
+# Release v0.1.4
+
+- Add share link functionality, where the site will get quadkeys from URL parameters
+- Add Google Analytics
+
+---
+
 # Release v0.1.3
 
 - Add title and icon to the page

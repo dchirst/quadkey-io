@@ -101,7 +101,6 @@ export function highlightQuadkeys(
 	newQuadkeys: string[],
 	flyTo: boolean = false
 ) {
-	console.log('highlightQuadkeys', newQuadkeys);
 	newQuadkeys = newQuadkeys.filter((qk) => /^[0-3]{1,16}$/.test(qk) && qk !== '');
 	if (!newQuadkeys || newQuadkeys.length === 0 || map === undefined) {
 		if (map !== undefined && map.getSource('highlight')) {
