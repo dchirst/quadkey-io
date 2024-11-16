@@ -46,78 +46,73 @@
 
 	$: highlightQuadkeys(map, $quadkeys, true);
 
-
-
 	onMount(() => {
-			const initialState = { lng: 0, lat: 0, zoom: $inputZoom };
+		const initialState = { lng: 0, lat: 0, zoom: $inputZoom };
 
-			zoom = initialState.zoom;
+		zoom = initialState.zoom;
 
-			if (
-				localStorage.theme === 'dark' ||
-				(!('color-theme' in localStorage) &&
-					window.matchMedia('(prefers-color-scheme: dark)').matches)
-			) {
-				dark = true;
-			} else {
-				dark = false;
-			}
-			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-				dark = event.matches;
-			});
-
-			map = new maplibregl.Map({
-				container: mapContainer,
-				style: `https://tiles.openfreemap.org/styles/positron`,
-				center: [initialState.lng, initialState.lat],
-				zoom: initialState.zoom
-			});
-
-			map.on('load', () => {
-				// Add quadkeys to the map
-				updateLines(map, initialState.zoom);
-				addQuadkeysToMap(map, initialState.zoom);
-			});
-
-
-
-			map.on('zoomend', () => {
-				// When zoom changes, update the lines and add new quadkeys
-				zoom = Math.ceil(map.getZoom());
-				addQuadkeysToMap(map, zoom);
-				updateLines(map, zoom);
-			});
-
-			map.on('moveend', () => {
-				// When zoom changes, update the lines and add new quadkeys
-				zoom = Math.ceil(map.getZoom());
-				addQuadkeysToMap(map, zoom);
-				updateLines(map, zoom);
-			});
-
-			map.on('click', (e) => {
-				// When a user clicks on the map, get the quadkey of the clicked tile
-				const { lng, lat } = e.lngLat;
-				console.log(lng, lat);
-				const clickedQuadkey = tileToQuadkey(pointToTile(lng, lat, zoom));
-				console.log('clickedQuadkey', clickedQuadkey);
-				if ($multiSelect) {
-					$quadkeys = [...$quadkeys, clickedQuadkey];
-				} else {
-					console.log('clickedQuadkey', clickedQuadkey);
-					$quadkeys = [clickedQuadkey];
-				}
-			});
-
-			map.on('style.load', () => {
-				loadQuadkeysFromParams();
-			});
-
+		if (
+			localStorage.theme === 'dark' ||
+			(!('color-theme' in localStorage) &&
+				window.matchMedia('(prefers-color-scheme: dark)').matches)
+		) {
+			dark = true;
+		} else {
+			dark = false;
 		}
-	);
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+			dark = event.matches;
+		});
+
+		map = new maplibregl.Map({
+			container: mapContainer,
+			style: `https://tiles.openfreemap.org/styles/positron`,
+			center: [initialState.lng, initialState.lat],
+			zoom: initialState.zoom
+		});
+
+		map.on('load', () => {
+			// Add quadkeys to the map
+			updateLines(map, initialState.zoom);
+			addQuadkeysToMap(map, initialState.zoom);
+		});
+
+		map.on('zoomend', () => {
+			// When zoom changes, update the lines and add new quadkeys
+			zoom = Math.ceil(map.getZoom());
+			addQuadkeysToMap(map, zoom);
+			updateLines(map, zoom);
+		});
+
+		map.on('moveend', () => {
+			// When zoom changes, update the lines and add new quadkeys
+			zoom = Math.ceil(map.getZoom());
+			addQuadkeysToMap(map, zoom);
+			updateLines(map, zoom);
+		});
+
+		map.on('click', (e) => {
+			// When a user clicks on the map, get the quadkey of the clicked tile
+			const { lng, lat } = e.lngLat;
+			console.log(lng, lat);
+			const clickedQuadkey = tileToQuadkey(pointToTile(lng, lat, zoom));
+			console.log('clickedQuadkey', clickedQuadkey);
+			if ($multiSelect) {
+				$quadkeys = [...$quadkeys, clickedQuadkey];
+			} else {
+				console.log('clickedQuadkey', clickedQuadkey);
+				$quadkeys = [clickedQuadkey];
+			}
+		});
+
+		map.on('style.load', () => {
+			loadQuadkeysFromParams();
+		});
+	});
 </script>
+
 <svelte:head>
-    <title>Quadkey Navigator</title>
+	<title>Quadkey Navigator</title>
 	<meta name="description" content="A tool to visualise quadkeys." />
 </svelte:head>
 
@@ -125,7 +120,6 @@
 <div class="relative w-full" style="height: 100vh">
 	<div class="absolute h-full w-full {dark ? 'mapDark' : ''}" bind:this={mapContainer}></div>
 </div>
-
 
 <style>
 	.mapDark {
