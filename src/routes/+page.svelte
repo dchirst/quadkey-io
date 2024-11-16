@@ -19,9 +19,6 @@
 	let zoom: number;
 	let dark: boolean;
 
-
-
-
 	// When the list of quadkeys changes, highlight them on the map
 
 	function handleInput(geojson: FeatureCollection | null, zoom: number) {
