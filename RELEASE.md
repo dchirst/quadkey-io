@@ -1,3 +1,11 @@
+# Release v0.2.0
+
+- Add cupertino pane for mobile
+- Small bugfixes
+- cleanup and restructure
+
+---
+
 # Release v0.1.4
 
 - Add share link functionality, where the site will get quadkeys from URL parameters
