@@ -1,50 +1,7 @@
 <script lang="ts">
-	import { handleArrowPress } from '$lib/utils';
 	import { ArrowBigUp, ArrowBigDown, ArrowBigLeft, ArrowBigRight } from 'lucide-svelte';
-	import { multiSelect, quadkeys } from '../stores';
-
-	export function handleKeyPress(event: KeyboardEvent) {
-		if (event.metaKey || event.ctrlKey) {
-			$multiSelect = true;
-			return;
-		}
-
-		let direction: string = '';
-		switch (event.key) {
-			case 'w':
-				direction = 'up';
-				break;
-			case 'a':
-				direction = 'left';
-				break;
-			case 's':
-				direction = 'down';
-				break;
-			case 'd':
-				direction = 'right';
-				break;
-		}
-		if (!direction) return;
-
-		changeQuadkey(direction);
-	}
-
-	export function handleKeyUp(event: KeyboardEvent) {
-		if (!event.metaKey && !event.ctrlKey) {
-			$multiSelect = false;
-		}
-	}
-
-	function changeQuadkey(direction: string) {
-		if ($quadkeys.length !== 1) return;
-		const newQuadkey = handleArrowPress($quadkeys[0], direction);
-		if (newQuadkey) {
-			$quadkeys = [newQuadkey];
-		}
-	}
+	import { changeQuadkey } from '$lib/utils/arrow';
 </script>
-
-<svelte:window on:keydown={handleKeyPress} on:keyup={handleKeyUp} />
 
 <div class="arrows p-3">
 	<div class="tooltip" data-tip="Move Quadkey Up">

@@ -7,36 +7,38 @@
 	let innerWidth = 0;
 
 	onMount(() => {
-			myPane = new CupertinoPane(
-      ".cupertino-pane", // Pane container selector
-      {
+		myPane = new CupertinoPane(
+			'.cupertino-pane', // Pane container selector
+			{
 				buttonDestroy: false,
 				bottomClose: false,
 				lowerThanBottom: false,
-				fastSwipeClose: false,
-      } as CupertinoSettings
-    );
+				fastSwipeClose: false
+			} as CupertinoSettings
+		);
 	});
 
-
 	function addCupertinoPane(width: number) {
-		if (myPane === undefined) return;
+		/** Add or remove the CupertinoPane based on the width of the screen
+		 *
+		 * @param {number} width - The width of the screen
+		 * */
+		if (!myPane) return;
 		const presented = myPane.isPanePresented();
 		if (width < 768 && !presented) {
-			myPane.present({animate: true});
+			myPane.present({ animate: true });
 		} else if (width >= 768 && presented) {
 			myPane.destroy();
 		}
 	}
 
 	$: addCupertinoPane(innerWidth);
-
 </script>
 
 <svelte:window bind:innerWidth />
 <div
-	class="max-md:hidden absolute left-0 top-0 z-50 m-[3vh] overflow-x-hidden box-border max-h-[94vh] w-96 overflow-y-auto rounded-2xl border-transparent bg-white p-5 md:shadow-lg dark:bg-gray-800"
+	class="absolute left-0 top-0 z-50 m-[3vh] box-border max-h-[94vh] w-96 overflow-y-auto overflow-x-hidden rounded-2xl border-transparent bg-white p-5 max-md:hidden md:shadow-lg dark:bg-gray-800"
 >
-	<slot/>
+	<slot />
 </div>
-<div class="cupertino-pane md:hidden p-5"><slot/></div>
+<div class="cupertino-pane p-5 md:hidden"><slot /></div>

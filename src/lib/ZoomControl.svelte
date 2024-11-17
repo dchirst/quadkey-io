@@ -7,6 +7,7 @@
 	$: disabled = $quadkeys.length > 1;
 
 	function handleZoomChange() {
+		/** Change the zoom level of the quadkey */
 		if ($quadkeys.length !== 1) return;
 
 		if ($quadkeys[0].length < zoom) {
@@ -31,7 +32,7 @@
 				type="number"
 				class="grow"
 				on:change={handleZoomChange}
-				placeholder={zoom}
+				placeholder={zoom.toString()}
 				bind:value={zoom}
 				{disabled}
 			/>

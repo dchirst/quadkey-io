@@ -1,33 +1,38 @@
 import * as turf from '@turf/turf';
 import type { Feature, FeatureCollection } from 'geojson';
+import { pointToTile, tileToQuadkey, tileToBBOX } from '@mapbox/tilebelt';
+import { getTileBounds } from './tile';
 import {
 	generateQuadkeysAndCenters,
-	getTileBounds,
-	quadkeyLatitudes,
-	quadkeyLongitudes,
+	latitudeLines,
+	longitudeLines,
 	quadkeysToGeojson
-} from '$lib/utils';
-import { pointToTile, tileToQuadkey, tileToBBOX } from '@mapbox/tilebelt';
+} from '$lib/utils/quadkey';
 
-export function updateLines(map: maplibregl.Map, zoom: number) {
+export function updateQuadkeyLines(map: maplibregl.Map, zoom: number) {
+	/** Update the lines that delineate quadkeys on a map
+	 *
+	 * @param {maplibregl.Map} map - map object
+	 * @param {number} zoom - zoom level
+	 */
 	const [minx, miny, maxx, maxy] = getTileBounds(map.getBounds(), zoom);
 
-	const longitudes = quadkeyLongitudes(zoom, minx, maxx);
-	const latitudes = quadkeyLatitudes(zoom, miny, maxy);
+	const longitudes = longitudeLines(zoom, minx, maxx);
+	const latitudes = latitudeLines(zoom, miny, maxy);
 
-	const longitudeLines = longitudes.map((lng) =>
+	const lonLines = longitudes.map((lng) =>
 		turf.lineString([
 			[lng, -90],
 			[lng, 90]
 		])
 	);
-	const latitudeLines = latitudes.map((lat) =>
+	const latLines = latitudes.map((lat) =>
 		turf.lineString([
 			[-180, lat],
 			[180, lat]
 		])
 	);
-	const geojson = turf.featureCollection([...longitudeLines, ...latitudeLines]);
+	const geojson = turf.featureCollection([...lonLines, ...latLines]);
 
 	if (map.getSource('lines')) {
 		const source = map.getSource('lines') as maplibregl.GeoJSONSource;
@@ -50,7 +55,12 @@ export function updateLines(map: maplibregl.Map, zoom: number) {
 	}
 }
 
-export function addQuadkeysToMap(map: maplibregl.Map, zoom: number) {
+export function addQuadkeyNamesToMap(map: maplibregl.Map, zoom: number) {
+	/** Add quadkey text to the map
+	 *
+	 * @param {maplibregl.Map} map - map object
+	 * @param {number}
+	 * */
 	const quadkeysAndCenters = generateQuadkeysAndCenters(map.getBounds(), zoom);
 	const features: Feature[] = quadkeysAndCenters.map(({ quadkey, center }) => ({
 		type: 'Feature',
@@ -101,9 +111,16 @@ export function highlightQuadkeys(
 	newQuadkeys: string[],
 	flyTo: boolean = false
 ) {
+	/** Highlight the selected quadkeys on the map
+	 *
+	 * @param {maplibregl.Map} map - map object
+	 * @param {string[]} newQuadkeys - list of quadkeys to highlight
+	 * @param {boolean} flyTo - whether to fly to the highlighted quadkeys
+	 * @returns {string[]} - list of highlighted quadkeys if there are any
+	 */
 	newQuadkeys = newQuadkeys.filter((qk) => /^[0-3]{1,16}$/.test(qk) && qk !== '');
 	if (!newQuadkeys || newQuadkeys.length === 0 || map === undefined) {
-		if (map !== undefined && map.getSource('highlight')) {
+		if (map !== undefined && map.getLayer('highlight')) {
 			map.removeLayer('highlight');
 			map.removeLayer('highlightedQuadkeyText');
 		}
@@ -121,7 +138,8 @@ export function highlightQuadkeys(
 			type: 'geojson',
 			data: fc
 		});
-
+	}
+	if (!map.getLayer('highlight') && !map.getLayer('highlightedQuadkeyText')) {
 		map.addLayer({
 			id: 'highlight',
 			type: 'fill',
@@ -158,7 +176,11 @@ export function highlightQuadkeys(
 }
 
 export function loadInputGeojson(map: maplibregl.Map, geojson: FeatureCollection | null) {
-	console.log('loadInputGeojson', geojson);
+	/** Load a GeoJSON object onto the map
+	 *
+	 * @param {maplibregl.Map} map - map object
+	 * @param {FeatureCollection} geojson - GeoJSON object
+	 */
 	if (!(geojson && map)) return;
 	if (map.getSource('inputGeojson')) {
 		const source = map.getSource('inputGeojson') as maplibregl.GeoJSONSource;
@@ -185,6 +207,12 @@ export function loadInputGeojson(map: maplibregl.Map, geojson: FeatureCollection
 }
 
 export function getQuadkeysInPolygon(geojson: FeatureCollection | null, zoom: number): string[] {
+	/** Get a list of quadkeys that intersect with a polygon
+	 *
+	 * @param {FeatureCollection} geojson - GeoJSON object
+	 * @param {number} zoom - zoom level
+	 * @returns {string[]} - list of quadkeys that overlap with the polygon
+	 */
 	if (!geojson) return [];
 	const bbox = turf.bbox(geojson);
 	const [minLng, minLat, maxLng, maxLat] = bbox;

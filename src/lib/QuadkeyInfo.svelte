@@ -6,11 +6,13 @@
 
 	let link: string;
 
-	function addQuadkeyInfo() {
+	function addNewQuadkey() {
+		/** Add a new quadkey to the list */
 		$quadkeys = [...$quadkeys, ''];
 	}
 
 	function getLink(linkQuadkeys: string[]): string {
+		/** Get the link to the map with the active quadkeys */
 		const url = new URL(window.location.href);
 		if (linkQuadkeys) {
 			url.searchParams.set('qk', linkQuadkeys.join(','));
@@ -36,6 +38,6 @@
 				<div class="divider"></div>
 			{/if}
 		{/each}
-		<button on:click={addQuadkeyInfo} class="btn mx-auto w-full">Add</button>
+		<button on:click={addNewQuadkey} class="btn mx-auto w-full">Add</button>
 	</div>
 </div>
