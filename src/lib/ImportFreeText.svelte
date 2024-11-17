@@ -19,12 +19,12 @@
 </script>
 
 <div>
-	<p class="my-3">Paste a valid GeoJSON to see the overlapping quadkeys.</p>
+	<p class="my-3">Paste a valid bounding box or GeoJSON to see the overlapping quadkeys.</p>
 	<textarea bind:value={freetext} class="textarea textarea-bordered {errorClass} w-full" />
 	{#if invalid}
 		<div class="alert alert-error">
 			<CircleX />
-			<p class="">Invalid GeoJSON</p>
+			<p class="">Invalid GeoJSON or BBox</p>
 		</div>
 	{/if}
 	<button on:click={handleImportFreeText} class="btn mt-3">Import </button>

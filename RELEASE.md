@@ -1,3 +1,9 @@
+# Release v0.2.1
+
+- Add support for bounding boxes
+
+---
+
 # Release v0.2.0
 
 - Add cupertino pane for mobile

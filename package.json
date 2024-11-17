@@ -1,6 +1,6 @@
 {
-	"name": "quadkey-io",
-	"version": "0.2.0",
+	"name": "quadkey-navigator",
+	"version": "0.2.1",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
