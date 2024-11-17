@@ -2,6 +2,7 @@
 	import type { Feature, Point } from 'geojson';
 	import { inputGeojson } from '../stores';
 	import { CircleX } from 'lucide-svelte';
+	import { pointToGeojson } from '$lib/utils/input';
 
 	let errorMessage = '';
 	let inputPoint: Feature<Point> | null = null;
@@ -10,6 +11,7 @@
 	let lat: string;
 
 	function handleImportPoint() {
+		/** Convert the input points to a geojson point */
 		if (lon === undefined || lat === undefined) {
 			errorMessage = 'Please enter both longitude and latitude.';
 			return;
@@ -29,23 +31,7 @@
 			return;
 		}
 
-		console.log(lonFloat, latFloat);
-
-		errorMessage = '';
-
-		$inputGeojson = {
-			type: 'FeatureCollection',
-			features: [
-				{
-					type: 'Feature',
-					geometry: {
-						type: 'Point',
-						coordinates: [lonFloat, latFloat]
-					},
-					properties: {}
-				}
-			]
-		};
+		$inputGeojson = pointToGeojson(lonFloat, latFloat);
 	}
 </script>
 

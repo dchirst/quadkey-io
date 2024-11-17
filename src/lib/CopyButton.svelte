@@ -6,6 +6,7 @@
 	let copied = false;
 
 	function handleCopy() {
+		/** Copy the text to the clipboard */
 		navigator.clipboard.writeText(textToCopy);
 		copied = true;
 		setTimeout(() => {

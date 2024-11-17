@@ -8,15 +8,7 @@
 	<h2 class="text-bold mb-2 text-lg">Import</h2>
 
 	<div role="tablist" class="tabs tabs-lifted">
-		<input
-			type="radio"
-			name="my_tabs_1"
-			role="tab"
-			class="tab"
-			aria-label="File"
-			checked="checked"
-		/>
-
+		<input type="radio" name="my_tabs_1" role="tab" class="tab" aria-label="File" checked={true} />
 		<div role="tabpanel" class="tab-content p-3">
 			<ImportFile />
 		</div>

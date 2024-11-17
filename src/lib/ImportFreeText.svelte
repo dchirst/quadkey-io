@@ -1,24 +1,20 @@
 <script lang="ts">
 	import { inputGeojson } from '../stores';
 	import { CircleX } from 'lucide-svelte';
+	import { inputToGeojson } from '$lib/utils/input.js';
 	let freetext = '';
 	let invalid = false;
 	let errorClass = '';
 
 	function handleImportFreeText() {
-		try {
-			const parsed = JSON.parse(freetext);
-			if ((parsed.type && parsed.type === 'FeatureCollection') || parsed.type === 'Feature') {
-				$inputGeojson = parsed;
-				invalid = false;
-			} else {
-				throw new Error('Invalid GeoJSON');
-			}
-		} catch {
+		/** Convert the input to GeoJSON */
+		$inputGeojson = inputToGeojson(freetext);
+		if (!$inputGeojson) {
 			invalid = true;
 		}
 	}
 
+	// Update the look of the textarea if it's invalid
 	$: errorClass = invalid ? 'textarea-error' : '';
 </script>
 
