@@ -4,7 +4,7 @@
 	import ImportFreeText from '$lib/ImportFreeText.svelte';
 </script>
 
-<div class="rounded-2xl  max-md:hidden">
+<div class="rounded-2xl">
 	<h2 class="text-bold mb-2 text-lg">Import</h2>
 
 	<div role="tablist" class="tabs tabs-lifted">

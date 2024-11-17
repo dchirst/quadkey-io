@@ -9,8 +9,12 @@
 	export let index: number;
 	let quadkey = '';
 	let bbox = '';
+	let invalid: boolean
 
 	// Update the quadkey in the store whenever the local quadkey changes
+	function invalidQuadkey(qk: string): boolean {
+		return qk.length > 0 && !( /^[0-3]{1,16}$/.test(qk)) ;
+	}
 
 	function updateQuadkeyOnTextChange(quadkey: string, index: number) {
 		if (!quadkey) return;
@@ -35,21 +39,27 @@
 
 	$: updateQuadkeyOnStoreChange($quadkeys);
 
+	$: invalid = invalidQuadkey(quadkey);
+
 	$: bbox = quadkeyToBBOX(quadkey)
 		.map((coord) => coord.toFixed(5))
 		.join(', ');
+
 	$: areaHa = area(bboxPolygon(quadkeyToBBOX(quadkey))) / 10000;
 </script>
 
 <div class="mb-4 flex items-center space-x-2">
 	<label for="quadkey-input" class="block text-left font-semibold text-gray-700">{index}</label>
+	<div class="{invalid ? 'tooltip tooltip-error' : ''} " data-tip="Invalid Quadkey">
 	<input
 		id="quadkey-input"
 		type="text"
-		class="input input-bordered w-full max-w-xs"
+		inputmode="numeric"
+		class="input input-bordered w-full max-w-xs {invalid ? 'input-error' : ''}"
 		placeholder="000000"
 		bind:value={quadkey}
 	/>
+	</div>
 	<CopyButton textToCopy={quadkey} tooltipText="Copy Quadkey"><Copy /></CopyButton>
 	<CopyButton textToCopy={areaHa} tooltipText="Copy quadkey area: {areaHa.toLocaleString()} ha"
 		><Scaling /></CopyButton
