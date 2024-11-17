@@ -13,7 +13,7 @@
 				buttonDestroy: false,
 				bottomClose: false,
 				lowerThanBottom: false,
-				fastSwipeClose: false
+				fastSwipeClose: true
 			} as CupertinoSettings
 		);
 	});
