@@ -8,13 +8,13 @@
 		addQuadkeyNamesToMap,
 		getQuadkeysInPolygon,
 		highlightQuadkeys,
+		loadInputGeojson,
 		updateQuadkeyLines
 	} from '$lib/utils/mapUtils';
 	import type { FeatureCollection } from 'geojson';
 
 	let map: maplibregl.Map;
 	let mapContainer: HTMLDivElement;
-	let zoom: number;
 	let dark: boolean;
 
 	function handleInput(geojson: FeatureCollection | null, zoom: number) {
@@ -24,6 +24,7 @@
 		 * @param {number} zoom - The current zoom level
 		 * */
 		if (!geojson) return;
+		loadInputGeojson(map, geojson);
 		$quadkeys = getQuadkeysInPolygon(geojson, zoom);
 	}
 
@@ -67,22 +68,24 @@
 
 		map.on('zoomend', () => {
 			// When zoom changes, update the lines and add new quadkeys
-			zoom = Math.ceil(map.getZoom());
+			const zoom = Math.ceil(map.getZoom());
 			updateQuadkeyLines(map, zoom);
 			updateQuadkeyLines(map, zoom);
 		});
 
 		map.on('move', () => {
 			// When zoom changes, update the lines and add new quadkeys
-			zoom = Math.ceil(map.getZoom());
+			const zoom = Math.ceil(map.getZoom());
 			addQuadkeyNamesToMap(map, zoom);
 			updateQuadkeyLines(map, zoom);
 		});
 
 		map.on('click', (e) => {
 			// When a user clicks on the map, get the quadkey of the clicked tile
+			const zoom = Math.ceil(map.getZoom());
 			const { lng, lat } = e.lngLat;
 			const clickedQuadkey = tileToQuadkey(pointToTile(lng, lat, zoom));
+			$inputZoom = zoom;
 			if ($multiSelect) {
 				$quadkeys = [...$quadkeys, clickedQuadkey];
 			} else {

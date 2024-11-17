@@ -42,3 +42,11 @@
 	<slot />
 </div>
 <div class="cupertino-pane p-5 md:hidden"><slot /></div>
+
+<style>
+	:global(.cupertino-pane-wrapper .pane) {
+		@apply bg-white;
+		@apply dark:bg-gray-800;
+		@apply dark:text-white;
+	}
+</style>
